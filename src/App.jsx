@@ -417,7 +417,231 @@ const ReadingPlatform = () => {
       </div>
     );
   }
- if (currentPage === 'progress') {
+ if (currentPage === 'video') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <nav className="bg-white shadow-sm p-4">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <Logo />
+            <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
+              <Home size={20} />
+              Dashboard
+            </button>
+          </div>
+        </nav>
+
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
+                      Hafta 1
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock size={16} />
+                      25 dakika
+                    </div>
+                  </div>
+                  <h1 className="text-3xl font-bold mb-2">Temeller ve Farkındalık</h1>
+                  <p className="opacity-90">Hızlı okuma yolculuğunuzun ilk adımı</p>
+                </div>
+
+                <div className="relative bg-black aspect-video">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <Video size={64} className="mx-auto mb-4 opacity-50" />
+                      <p className="text-lg mb-4">Video Player</p>
+                      <p className="text-sm opacity-75">Gerçek videolar yüklendikinde burada görünecek</p>
+                      <button 
+                        onClick={() => {
+                          setVideoProgress(100);
+                          setVideoCompleted(true);
+                        }}
+                        className="mt-4 bg-indigo-600 px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
+                      >
+                        Demo: Videoyu Tamamlandı Say
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 border-b">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">İzleme İlerlemesi</span>
+                    <span className="text-sm font-bold text-indigo-600">{videoProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${videoProgress}%` }}
+                    ></div>
+                  </div>
+                  {videoCompleted && (
+                    <div className="mt-4 flex items-center gap-2 text-green-600">
+                      <CheckCircle size={20} />
+                      <span className="font-medium">Video tamamlandı! 🎉</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-b">
+                  <div className="flex">
+                    <button 
+                      onClick={() => setShowVideoNotes(false)}
+                      className={`px-6 py-3 font-medium border-b-2 transition ${
+                        !showVideoNotes 
+                          ? 'border-indigo-600 text-indigo-600' 
+                          : 'border-transparent text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Genel Bakış
+                    </button>
+                    <button 
+                      onClick={() => setShowVideoNotes(true)}
+                      className={`px-6 py-3 font-medium border-b-2 transition ${
+                        showVideoNotes 
+                          ? 'border-indigo-600 text-indigo-600' 
+                          : 'border-transparent text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Ders Notları
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {!showVideoNotes ? (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-3">Bu Derste Neler Öğreneceksiniz?</h3>
+                        <ul className="space-y-2">
+                          {[
+                            "Okuma Hızı Testi - Teori ve Uygulama",
+                            "Yavaş Okuma Nedenleri",
+                            "Göz Hareketleri Egzersizleri",
+                            "Paragraf Yapısı",
+                            "Ana Fikir Bulma Teknikleri"
+                          ].map((topic, idx) => (
+                            <li key={idx} className="flex items-start gap-3">
+                              <div className="mt-1 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                <span className="text-indigo-600 text-sm font-bold">{idx + 1}</span>
+                              </div>
+                              <span className="text-gray-700">{topic}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-3">Bu Hafta Yapılacaklar</h3>
+                        <div className="space-y-2">
+                          {[
+                            "Okuma hızı testi yapın (2 kez)",
+                            "Göz egzersizleri: Günde 5 dakika, 7 gün",
+                            "10 paragrafta ana fikir bulma pratikleri",
+                            "Alışkanlık takip formu doldurun"
+                          ].map((task, idx) => (
+                            <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                              <Circle className="text-gray-400 flex-shrink-0 mt-0.5" size={18} />
+                              <span className="text-gray-700">{task}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="prose max-w-none">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">Hafta 1 - Detaylı Ders Notları</h3>
+                      
+                      <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                        <p className="font-semibold text-blue-900 mb-2">📝 Not Alma İpucu</p>
+                        <p className="text-blue-800 text-sm">
+                          Bu notları yazdırıp yanınızda bulundurabilir, önemli yerlerin altını çizebilirsiniz.
+                        </p>
+                      </div>
+
+                      <h4 className="text-lg font-bold mt-6 mb-3">1. Okuma Hızı Nasıl Ölçülür?</h4>
+                      <p className="text-gray-700 mb-4">
+                        Okuma hızınızı ölçmek için basit bir formül kullanıyoruz:
+                      </p>
+                      <div className="bg-gray-100 p-4 rounded-lg mb-4 font-mono text-center">
+                        (Kelime Sayısı ÷ Okuma Süresi (saniye)) × 60 = Kelime/Dakika
+                      </div>
+
+                      <h4 className="text-lg font-bold mt-6 mb-3">2. Sizi Yavaşlatan 5 Alışkanlık</h4>
+                      <div className="space-y-3">
+                        <div className="border-l-4 border-red-500 pl-4">
+                          <h5 className="font-bold text-gray-900">Alt Seslendirme</h5>
+                          <p className="text-gray-700 text-sm">
+                            Okuduğunuz kelimeleri içinizden telaffuz etme. Konuşma hızınızla sınırlı kalırsınız.
+                          </p>
+                        </div>
+                        <div className="border-l-4 border-red-500 pl-4">
+                          <h5 className="font-bold text-gray-900">Geri Dönüş</h5>
+                          <p className="text-gray-700 text-sm">
+                            Okuduğunuz yere tekrar tekrar dönme. Güvensizlik ve yavaşlığa neden olur.
+                          </p>
+                        </div>
+                      </div>
+
+                      <h4 className="text-lg font-bold mt-6 mb-3">3. Göz Egzersizleri</h4>
+                      <p className="text-gray-700 mb-3">
+                        Her gün 5 dakika yapılması gereken 3 temel egzersiz:
+                      </p>
+                      <ul className="list-disc pl-6 space-y-2 text-gray-700">
+                        <li><strong>Zigzag Takip:</strong> Parmağınızla zigzag çizerken sadece gözlerinizle takip edin</li>
+                        <li><strong>Yatay Genişleme:</strong> Bir satırın başını ve sonunu aynı anda görmeye çalışın</li>
+                        <li><strong>Dikey Atlama:</strong> Her satırın ortasına odaklanarak dikey inin</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <BarChart3 className="text-indigo-600" size={20} />
+                  İlerleme Durumu
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Video</span>
+                    <span className="text-sm font-bold">{videoCompleted ? '✓' : '○'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Ana Fikir Quiz</span>
+                    <span className="text-sm font-bold">○</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Hız Testi</span>
+                    <span className="text-sm font-bold">○</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <h3 className="font-bold mb-3">Sonraki Adım</h3>
+                <p className="text-sm opacity-90 mb-4">
+                  Videoyu izledikten sonra quiz'e geçin!
+                </p>
+                <button 
+                  onClick={() => setCurrentPage('quiz')}
+                  className="w-full bg-white text-indigo-600 py-2 rounded-lg font-semibold hover:bg-gray-100 transition"
+                >
+                  Quiz'e Başla →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (currentPage === 'progress') {
     const initialSpeed = studentStats.readingSpeedHistory[0].speed;
     const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
     const improvement = currentSpeed - initialSpeed;
