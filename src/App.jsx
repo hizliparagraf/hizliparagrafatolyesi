@@ -94,9 +94,81 @@ const ReadingPlatform = () => {
       ],
       correctAnswer: 3,
       explanation: "Asıl vurgu son cümlede: 'en değerli alışkanlıklardan biri' ve 'çocukluk yaşlarında kazandırılması gereken'."
-    }
-  ];
-
+    },
+    {
+      id: 3,
+      difficulty: "Orta",
+      text: "İnsan beyni, öğrenme kapasitesi en yüksek organ olmasına rağmen, sürekli tekrar olmadan öğrendiklerini unutabilir. Nörologlar, öğrenilen bir bilginin kalıcı hale gelmesi için en az 6-7 kez tekrar edilmesi gerektiğini söyler. Tekrar, öğrenmenin anahtarıdır ve bilgilerin uzun süreli belleğe yerleşmesini sağlar. Öğrenciler ders çalışırken sadece bir kez okumakla yetinmemeli, düzenli aralıklarla konuları gözden geçirmelidir.",
+      question: "Bu parçada anlatılmak istenen temel düşünce nedir?",
+      options: [
+        "İnsan beyni öğrenme kapasitesi en yüksek organdır.",
+        "Bilgilerin kalıcı olması için tekrar şarttır.",
+        "Öğrenciler düzenli çalışmalıdır.",
+        "Beyin kaslar gibi egzersizle güçlenir."
+      ],
+      correctAnswer: 1,
+      explanation: "Ana fikir ortadaki cümlede: 'Tekrar, öğrenmenin anahtarıdır...'. İlk cümle giriş, sonrakiler örnektir."
+    },
+    {
+      id: 4,
+      difficulty: "Orta",
+      text: "Yapılan araştırmalar, fiziksel aktivitenin sadece bedensel sağlığı değil, zihinsel sağlığı da olumlu etkilediğini gösteriyor. Düzenli egzersiz yapan kişilerde stres hormonu kortizolün seviyesi düşüyor ve mutluluk hormonu endorfin salgılanıyor. Özellikle açık havada yapılan aktiviteler, bireylerin ruh halini iyileştirerek depresyon riskini azaltıyor. Ayrıca spor, konsantrasyonu artırıyor ve bilişsel fonksiyonları geliştiriyor. Tüm bu veriler gösteriyor ki spor, yalnızca fiziksel değil, ruhsal bir ihtiyaçtır.",
+      question: "Paragrafın ana fikrini veren cümle hangisidir?",
+      options: [
+        "İlk cümle",
+        "İkinci cümle",
+        "Dördüncü cümle",
+        "Son cümle"
+      ],
+      correctAnswer: 3,
+      explanation: "Yazar önce detayları sıralıyor, sonunda ana fikri özetliyor: 'spor... ruhsal bir ihtiyaçtır'."
+    },
+    {
+      id: 5,
+      difficulty: "Orta",
+      text: "Teknolojinin eğitime entegrasyonu, öğrenme süreçlerini köklü bir şekilde değiştirmiştir. Geleneksel sınıf ortamlarında öğretmen merkezli olan eğitim, dijital araçlarla birlikte öğrenci merkezli hale gelmiştir. Tablet ve akıllı tahtalar sayesinde dersler daha interaktif ve eğlenceli hale gelmiş, öğrencilerin ilgisi artmıştır. Online eğitim platformları, öğrencilere kendi hızlarında öğrenme imkanı sunarak bireysel farklılıkları dikkate almaktadır.",
+      question: "Bu paragrafta vurgulanan ana düşünce nedir?",
+      options: [
+        "Eğitimde teknoloji kullanımı dikkatli olmalıdır.",
+        "Teknoloji, eğitimi öğrenci merkezli hale getirmiştir.",
+        "Teknoloji eğitim süreçlerini köklü şekilde değiştirmiştir.",
+        "Online platformlar bireysel farklılıkları dikkate alır."
+      ],
+      correctAnswer: 2,
+      explanation: "İlk cümle ana fikri veriyor: 'köklü bir şekilde değiştirmiştir'. Sonrakiler nasıl değiştirdiğini açıklıyor."
+    },
+    {
+      id: 6,
+      difficulty: "Zor",
+      text: "Sosyal medya platformları, milyarlarca insanı bir araya getirerek iletişimi kolaylaştırmıştır. İnsanlar dünyanın her yerinden haber alabilir, arkadaşlarıyla anında iletişime geçebilir ve fikirlerini özgürce paylaşabilirler. Ancak bu platformlarda geçirilen aşırı zaman, gerçek hayattaki ilişkileri zayıflatmakta, yüz yüze iletişim becerilerini olumsuz etkilemektedir. Özellikle gençler arasında beğeni odaklı yaşam tarzı, özgüven eksikliği ve karşılaştırma sendromu yaygınlaşmıştır. Bilim insanları, sosyal medya kullanımının kontrollü ve bilinçli yapılması gerektiğini vurgulamaktadır.",
+      question: "Bu paragrafın temel iletisi nedir?",
+      options: [
+        "Sosyal medya iletişimi kolaylaştırır.",
+        "Gençler sosyal medyada çok vakit geçiriyor.",
+        "Sosyal medyanın olumlu ve olumsuz yanları vardır, bilinçli kullanılmalıdır.",
+        "Sosyal medya özgüven sorunlarına yol açar."
+      ],
+      correctAnswer: 2,
+      explanation: "Paragrafta hem olumlu hem olumsuz yönler anlatılıyor ve sonuçta 'kontrollü kullanım' önerisi yapılıyor. Ana fikir tüm paragraftan çıkarılmalıdır."
+    },
+    {
+      id: 7,
+      difficulty: "Zor",
+      text: "Antik çağlardan bu yana insanlar, yıldızlara bakarak yön bulmuş, takvim oluşturmuş ve gelecekle ilgili tahminlerde bulunmuştur. Astronomi bilimi, evreni anlama çabasının ürünüdür. İnsanoğlu, evrendeki yerini anlamak ve bilinmeyene dair merakını gidermek için sürekli gökyüzüne bakmış, sorular sormuştur. Galileo'nun teleskopu icat etmesiyle başlayan modern astronomi, bugün uzay teleskopları ve Mars'a gönderilen araçlarla devam etmektedir. Uzayı keşfetme çabası, insan doğasının en temel özelliklerinden biri olan merak duygusunun bir yansımasıdır.",
+      question: "Paragrafın ana fikri hangisidir?",
+      options: [
+        "İnsanlar antik çağdan beri astronomiyle ilgilenir.",
+        "İnsan, merak duygusuyla evreni anlamaya çalışır.",
+        "Modern astronomi Galileo ile başlamıştır.",
+        "Uzay keşfi insanlık için önemlidir."
+      ],
+      correctAnswer: 1,
+      explanation: "Ana fikir: 'evrendeki yerini anlamak ve merakını gidermek'. İlk ve son cümleler bu fikri destekler. 'Merak' kelimesi hem ortada hem sonda geçiyor."
+    },
+    {
+      id: 8,
+      difficulty: "Zor",
+      text: "Ormanlar, sadece ağaçlardan ibaret değildir; binlerce canlı türünün yaşam alanıdır. Ağaçlar oksijen üretir, havayı temizler ve iklimi dengele
   const testText = "Eğitim, bireyin zihinsel, duygusal ve sosyal gelişimini destekleyen en önemli araçlardan biridir. İyi bir eğitim sistemi, öğrencilerin sadece bilgi edinmesini değil, aynı zamanda eleştirel düşünme, problem çözme ve yaratıcılık becerilerini de geliştirmesini sağlar.";
   const wordCount = testText.split(' ').length;
 
