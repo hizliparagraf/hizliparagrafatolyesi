@@ -168,9 +168,10 @@ const ReadingPlatform = () => {
     {
       id: 8,
       difficulty: "Zor",
-      text: "Ormanlar, sadece ağaçlardan ibaret değildir; binlerce canlı türünün yaşam alanıdır. Ağaçlar oksijen üretir, havayı temizler ve iklimi dengele",
+      text: "Ormanlar, sadece ağaçlardan ibaret değildir; binlerce canlı türünün yaşam alanıdır. Ağaçlar oksijen üretir, havayı temizler ve iklimi dengeler"
+    },
   const testText = "Eğitim, bireyin zihinsel, duygusal ve sosyal gelişimini destekleyen en önemli araçlardan biridir. İyi bir eğitim sistemi, öğrencilerin sadece bilgi edinmesini değil, aynı zamanda eleştirel düşünme, problem çözme ve yaratıcılık becerilerini de geliştirmesini sağlar.";
-}
+
   const wordCount = testText.split(' ').length;
 
   useEffect(() => {
