@@ -168,12 +168,46 @@ const ReadingPlatform = () => {
     {
       id: 8,
       difficulty: "Zor",
-      text: "Ormanlar, sadece ağaçlardan ibaret değildir; binlerce canlı türünün yaşam alanıdır. Ağaçlar oksijen üretir, havayı temizler ve iklimi dengeler"
+      text: "Ormanlar, sadece ağaçlardan ibaret değildir; binlerce canlı türünün yaşam alanıdır. Ağaçlar oksijen üretir, havayı temizler ve iklimi dengeler. Orman toprağı su tutar, seller önler ve toprak erozyonunu engeller. Hayvanlar için barınak, besin kaynağı ve üreme alanı sağlar. İnsanlar için odun, meyve ve şifalı bitkiler sunar. Bu kadar çok işleve sahip ormanları korumak, aslında kendi geleceğimizi korumak demektir.",
+      question: "Yazarın bu paragrafta vurgulamak istediği asıl düşünce nedir?",
+      options: [
+        "Ormanlar binlerce canlı türüne ev sahipliği yapar.",
+        "Ağaçlar oksijen üretir ve havayı temizler.",
+        "Ormanları korumak, geleceğimizi korumaktır.",
+        "Ormanlar insanlara birçok fayda sağlar."
+      ],
+      correctAnswer: 2,
+      explanation: "Yazar önce ormanların faydalarını sıralıyor, sonunda asıl mesajını veriyor: 'korumak... geleceğimizi korumak'. Bu sonuç cümlesidir."
     },
-  const testText = "Eğitim, bireyin zihinsel, duygusal ve sosyal gelişimini destekleyen en önemli araçlardan biridir. İyi bir eğitim sistemi, öğrencilerin sadece bilgi edinmesini değil, aynı zamanda eleştirel düşünme, problem çözme ve yaratıcılık becerilerini de geliştirmesini sağlar.";
-
-  const wordCount = testText.split(' ').length;
-
+    {
+      id: 9,
+      difficulty: "Çok Zor",
+      text: "Eleştirel düşünme, bir bilgiyi sorgusuz kabul etmek yerine, onu analiz etme ve değerlendirme yeteneğidir. Günümüzde yanlış bilginin hızla yayıldığı dijital ortamda, gördüğümüz her habere inanmak büyük yanılgılara yol açabilir. Bir bilginin doğruluğunu sorgulamak, kaynaklarını araştırmak ve farklı bakış açılarını değerlendirmek, bilinçli bir birey olmanın gereğidir. Okullar, öğrencilere sadece bilgi aktarmakla kalmamalı, onlara nasıl düşüneceklerini de öğretmelidir. Çünkü gelecekte başarılı olacak kişiler, en çok bilgi bilenler değil, bilgiyi doğru değerlendirebilen ve kullanabilen kişiler olacaktır.",
+      question: "Bu paragrafın temel mesajı nedir?",
+      options: [
+        "Dijital ortamda yanlış bilgi çok yaygındır.",
+        "Eleştirel düşünme becerisi günümüzde çok önemlidir.",
+        "Okullar öğrencilere düşünmeyi öğretmelidir.",
+        "Gelecekte başarı için çok bilgi gerekir."
+      ],
+      correctAnswer: 1,
+      explanation: "Ana fikir ilk cümlede tanımlanıyor ve tüm paragraf 'neden önemli' açıklıyor. Son cümle de bu önemi pekiştiriyor."
+    },
+    {
+      id: 10,
+      difficulty: "Çok Zor",
+      text: "İklim değişikliği, dünyamızın karşı karşıya olduğu en büyük tehditlerin başında gelir. Buzullar eriyor, deniz seviyeleri yükseliyor ve aşırı hava olayları sıklaşıyor. Bilim insanları onlarca yıldır uyarılarda bulunmasına rağmen, küresel ölçekte yeterli önlem alınmamıştır. Fosil yakıt kullanımı azaltılmalı, yenilenebilir enerji kaynaklarına geçilmeli ve orman tahribatı durdurulmalıdır. Ancak bireysel çabalar da önemlidir: su ve enerji tasarrufu, geri dönüşüm ve bilinçli tüketim gibi küçük adımlar, topluca büyük fark yaratabilir. Sorun büyük ama çözümsüz değil; herkesin üzerine düşeni yapması, gezegenimizi kurtarmak için şarttır.",
+      question: "Bu paragrafın ana fikri en iyi hangisiyle ifade edilir?",
+      options: [
+        "İklim değişikliği dünyanın en büyük sorunudur.",
+        "Bilim insanları yıllardır uyarı yapıyor ama dinlenmiyor.",
+        "İklim krizine karşı hem küresel politikalar hem bireysel çabalar gereklidir.",
+        "Bireysel küçük adımlar büyük fark yaratabilir."
+      ],
+      correctAnswer: 2,
+      explanation: "Paragraf sorun + çözüm yapısında. Ana fikir sadece sorunu değil, çözümü de içermeli. C hem küresel hem bireysel çözümleri kapsıyor."
+    }
+  ];
   useEffect(() => {
     let interval;
     if (isReading && startTime) {
