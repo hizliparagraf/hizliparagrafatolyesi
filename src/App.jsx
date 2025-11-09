@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
+import { auth } from './firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const ReadingPlatform = () => {
   const [currentPage, setCurrentPage] = useState('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authMode, setAuthMode] = useState('login'); // 'login' veya 'register'
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
   
   const [isReading, setIsReading] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -101,7 +109,20 @@ const ReadingPlatform = () => {
     }
     return () => clearInterval(interval);
   }, [isReading, startTime]);
-
+  
+useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+        setCurrentPage('landing');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+  
   const formatTime = (ms) => {
     const seconds = Math.floor(ms / 1000);
     const milliseconds = Math.floor((ms % 1000) / 100);
