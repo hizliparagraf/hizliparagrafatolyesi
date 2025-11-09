@@ -188,6 +188,66 @@ useEffect(() => {
     setQuizCompleted(false);
   };
 
+  // Kayıt fonksiyonu
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    try {
+      await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+      setAuthEmail('');
+      setAuthPassword('');
+      setCurrentPage('dashboard');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        setAuthError('Bu email adresi zaten kullanılıyor.');
+      } else if (error.code === 'auth/weak-password') {
+        setAuthError('Şifre en az 6 karakter olmalıdır.');
+      } else if (error.code === 'auth/invalid-email') {
+        setAuthError('Geçersiz email adresi.');
+      } else {
+        setAuthError('Kayıt sırasında bir hata oluştu.');
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Giriş fonksiyonu
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, authEmail, authPassword);
+      setAuthEmail('');
+      setAuthPassword('');
+      setCurrentPage('dashboard');
+    } catch (error) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        setAuthError('Email veya şifre hatalı.');
+      } else if (error.code === 'auth/invalid-email') {
+        setAuthError('Geçersiz email adresi.');
+      } else {
+        setAuthError('Giriş sırasında bir hata oluştu.');
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Çıkış fonksiyonu
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setCurrentPage('landing');
+    } catch (error) {
+      console.error('Çıkış hatası:', error);
+    }
+  };
+  
   const Logo = () => (
     <div className="flex items-center gap-2">
       <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -200,34 +260,136 @@ useEffect(() => {
     </div>
   );
 
-  const LandingPage = () => (
+const LandingPage = () => (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
       <header className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
-          <button onClick={() => { setIsLoggedIn(true); setCurrentPage('dashboard'); }} className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">
-            Giriş Yap
+          <button 
+            onClick={() => setCurrentPage('auth')} 
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
+          >
+            Giriş Yap / Kayıt Ol
           </button>
         </div>
       </header>
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl font-bold mb-6">Okuma Hızını <span className="text-indigo-600">2 Katına</span> Çıkar</h1>
+        <h1 className="text-5xl font-bold mb-6">
+          Okuma Hızını <span className="text-indigo-600">2 Katına</span> Çıkar
+        </h1>
         <p className="text-xl text-gray-600 mb-8">8 haftalık interaktif program</p>
-        <button onClick={() => { setIsLoggedIn(true); setCurrentPage('dashboard'); }} className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700">
+        <button 
+          onClick={() => setCurrentPage('auth')} 
+          className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700"
+        >
           Hemen Başla
         </button>
       </div>
     </div>
   );
+  const AuthPage = () => (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <Logo />
+          <h2 className="text-3xl font-bold text-gray-900 mt-6 mb-2">
+            {authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
+          </h2>
+          <p className="text-gray-600">
+            {authMode === 'login' 
+              ? 'Hesabınıza giriş yapın' 
+              : 'Yeni hesap oluşturun ve başlayın'}
+          </p>
+        </div>
 
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <form onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">Email</label>
+              <input
+                type="email"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="ornek@email.com"
+                required
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-gray-700 font-medium mb-2">Şifre</label>
+              <input
+                type="password"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="En az 6 karakter"
+                required
+                minLength={6}
+              />
+            </div>
+
+            {authError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {authError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={authLoading}
+              className={`w-full py-3 rounded-lg font-semibold text-white transition ${
+                authLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-indigo-600 hover:bg-indigo-700'
+              }`}
+            >
+              {authLoading 
+                ? 'İşlem yapılıyor...' 
+                : authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => {
+                setAuthMode(authMode === 'login' ? 'register' : 'login');
+                setAuthError('');
+              }}
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              {authMode === 'login' 
+                ? 'Hesabınız yok mu? Kayıt olun' 
+                : 'Zaten hesabınız var mı? Giriş yapın'}
+            </button>
+          </div>
+
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setCurrentPage('landing')}
+              className="text-gray-600 hover:text-gray-700"
+            >
+              ← Ana Sayfaya Dön
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  
   const Dashboard = () => (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
-          <button onClick={() => { setIsLoggedIn(false); setCurrentPage('landing'); }} className="text-red-600">
-            <LogOut size={20} />
-          </button>
+          <div className="flex items-center gap-4">
+  {user && (
+    <span className="text-gray-700 text-sm">{user.email}</span>
+  )}
+  <button onClick={handleLogout} className="text-red-600 hover:text-red-700">
+    <LogOut size={20} />
+  </button>
+</div>
         </div>
       </nav>
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -386,6 +548,7 @@ useEffect(() => {
   };
 
   if (!isLoggedIn && currentPage === 'landing') return <LandingPage />;
+  if (currentPage === 'auth') return <AuthPage />;
   if (currentPage === 'quiz') return <QuizPage />;
   if (currentPage === 'test') {
     return (
