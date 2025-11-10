@@ -808,9 +808,12 @@ const LandingPage = () => (
     );
   };
 
-  if (!isLoggedIn && currentPage === 'landing') return <LandingPage />;
-  if (currentPage === 'auth') return <AuthPage />;
-  if (currentPage === 'quiz') return <QuizPage />;
+  if (!isLoggedIn && currentPage === 'landing') return LandingPage();
+
+  if (currentPage === 'auth') return AuthPage();
+
+  if (currentPage === 'quiz') return QuizPage();
+
   if (currentPage === 'test') {
     return (
       <div className="min-h-screen bg-gray-50">
