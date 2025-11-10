@@ -1086,132 +1086,67 @@ const LandingPage = () => (
       </div>
     );
   }
-  if (currentPage === 'progress') {
-    const initialSpeed = studentStats.readingSpeedHistory[0].speed;
-    const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
-    const improvement = currentSpeed - initialSpeed;
-    const improvementPercent = Math.round((improvement / initialSpeed) * 100);
-
-    return (
+ return (
+  <>
+    {(!isLoggedIn && currentPage === 'landing') && <LandingPage />}
+    {currentPage === 'auth' && <AuthPage />}
+    {currentPage === 'quiz' && <QuizPage />}
+    {currentPage === 'test' && (
       <div className="min-h-screen bg-gray-50">
         <nav className="bg-white shadow-sm p-4">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="max-w-4xl mx-auto flex justify-between items-center">
             <Logo />
-            <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
-              <Home size={20} />
-              Dashboard
-            </button>
+            <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline">← Dashboard</button>
           </div>
         </nav>
 
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">İlerleme & İstatistikler</h1>
-            <p className="text-gray-600">Gelişiminizi takip edin</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100">Mevcut Hız</span>
-                <TrendingUp size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">{currentSpeed}</div>
-              <div className="text-indigo-100 text-sm">kelime/dakika</div>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-green-100">Gelişim</span>
-                <Award size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">+{improvement}</div>
-              <div className="text-green-100 text-sm">kelime ({improvementPercent}% artış)</div>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-purple-100">Quiz Başarısı</span>
-                <CheckCircle size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">%{studentStats.quizPerformance.accuracy}</div>
-              <div className="text-purple-100 text-sm">{studentStats.quizPerformance.correctAnswers}/{studentStats.quizPerformance.totalQuestions} doğru</div>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-orange-100">Toplam Test</span>
-                <BarChart3 size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">{studentStats.readingSpeedHistory.length}</div>
-              <div className="text-orange-100 text-sm">hız testi</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <TrendingUp className="text-indigo-600" />
-              Okuma Hızı Gelişimi
-            </h2>
-            
-            <div className="space-y-4">
-              {studentStats.readingSpeedHistory.map((item, idx) => (
-                <div key={idx}>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">{item.test}</span>
-                    <span className="text-sm font-bold text-indigo-600">{item.speed} kelime/dk</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 w-16">{item.date}</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000"
-                        style={{ width: `${(item.speed / 400) * 100}%` }}
-                      >
-                        <span className="text-white text-xs font-bold">{item.speed}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-6 border-t">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Hedef: 400 kelime/dakika</span>
-                <span className="text-sm font-bold text-gray-900">{Math.round((currentSpeed/400)*100)}% tamamlandı</span>
-              </div>
-              <div className="bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all"
-                  style={{ width: `${(currentSpeed/400)*100}%` }}
-                ></div>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <h1 className="text-3xl font-bold mb-6">Okuma Hızı Testi</h1>
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-4 bg-gray-100 px-8 py-4 rounded-lg">
+                <Clock className="text-indigo-600" size={32} />
+                <div className="text-4xl font-bold">{formatTime(elapsedTime)}</div>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-            <h3 className="text-2xl font-bold mb-3">🎉 Harika Gidiyorsun!</h3>
-            <p className="text-indigo-100 mb-4">
-              Okuma hızında {improvementPercent}% artış sağladın. Bu tempoyu koru!
-            </p>
-            <div className="bg-white/20 p-4 rounded-lg">
-              <p className="text-sm font-medium mb-2">Bir Sonraki Hedef:</p>
-              <p className="text-lg font-bold">300 kelime/dakika</p>
-              <div className="mt-2 bg-white/30 rounded-full h-2">
-                <div 
-                  className="bg-white h-2 rounded-full"
-                  style={{ width: `${(currentSpeed/300)*100}%` }}
-                ></div>
-              </div>
+            <div className="bg-gray-50 p-8 rounded-lg mb-8">
+              <p className="text-lg leading-relaxed">{testText}</p>
             </div>
+            <div className="flex gap-4 justify-center">
+              {!isReading && !showResult && (
+                <button onClick={startReading} className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700">
+                  <Play size={24} />Teste Başla
+                </button>
+              )}
+              {isReading && (
+                <button onClick={stopReading} className="flex items-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700">
+                  <Pause size={24} />Testi Bitir
+                </button>
+              )}
+              {(isReading || showResult) && (
+                <button onClick={resetTest} className="flex items-center gap-2 bg-gray-600 text-white px-6 py-4 rounded-lg hover:bg-gray-700">
+                  <RotateCcw size={20} />Sıfırla
+                </button>
+              )}
+            </div>
+            {showResult && currentResult && (
+              <div className="mt-8 bg-green-50 border-2 border-green-200 rounded-xl p-8 text-center">
+                <Award className="inline-block text-green-600 mb-4" size={64} />
+                <h2 className="text-2xl font-bold mb-4">Test Tamamlandı!</h2>
+                <div className="text-5xl font-bold text-indigo-600 mb-2">{currentResult.wpm}</div>
+                <div className="text-gray-600">kelime/dakika</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    );
-  }
-  
-  return <Dashboard />;
+    )}
+    {currentPage === 'video' && <VideoPage />}
+    {currentPage === 'progress' && <ProgressPage />}
+    {currentPage === 'dashboard' && <Dashboard />}
+  </>
+);
+
 };
 
 export default ReadingPlatform;
