@@ -355,7 +355,104 @@ useEffect(() => {
       console.error('Çıkış hatası:', error);
     }
   };
-  
+  // Auth Page Component
+  const AuthPageContent = () => {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <Logo />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              {authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
+            </h2>
+            <p className="text-gray-600">
+              {authMode === 'login' 
+                ? 'Hesabınıza giriş yapın' 
+                : 'Yeni hesap oluşturun ve başlayın'}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <form onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">Email</label>
+                <input
+                  type="email"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  placeholder="ornek@email.com"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-gray-700 font-medium mb-2">Şifre</label>
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  placeholder="En az 6 karakter"
+                  required
+                  minLength={6}
+                  autoComplete="current-password"
+                />
+              </div>
+
+              {authError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {authError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={authLoading}
+                className={`w-full py-3 rounded-lg font-semibold text-white transition ${
+                  authLoading 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-indigo-600 hover:bg-indigo-700'
+                }`}
+              >
+                {authLoading 
+                  ? 'İşlem yapılıyor...' 
+                  : authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode(authMode === 'login' ? 'register' : 'login');
+                  setAuthError('');
+                }}
+                className="text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                {authMode === 'login' 
+                  ? 'Hesabınız yok mu? Kayıt olun' 
+                  : 'Zaten hesabınız var mı? Giriş yapın'}
+              </button>
+            </div>
+
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => setCurrentPage('landing')}
+                className="text-gray-600 hover:text-gray-700"
+              >
+                ← Ana Sayfaya Dön
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
   const Logo = () => (
     <div className="flex items-center gap-2">
       <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -395,7 +492,7 @@ const LandingPage = () => (
       </div>
     </div>
   );
-  const AuthPage = () => (
+  const AuthPage = () => <AuthPageContent />;
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
