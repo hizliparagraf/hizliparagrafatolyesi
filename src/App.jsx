@@ -30,42 +30,47 @@ const ReadingPlatform = () => {
   const [videoCompleted, setVideoCompleted] = useState(false);
   const [showVideoNotes, setShowVideoNotes] = useState(false);
 
-  const studentStats = {
-    weeklyActivity: [
-      { week: 'Hafta 1', completed: 75 },
-      { week: 'Hafta 2', completed: 0 },
-      { week: 'Hafta 3', completed: 0 },
-      { week: 'Hafta 4', completed: 0 }
-    ],
-    readingSpeedHistory: [
-      { date: '1 Kas', speed: 200, test: 'İlk Test' },
-      { date: '3 Kas', speed: 225, test: 'Test 2' },
-      { date: '5 Kas', speed: 245, test: 'Test 3' },
-      { date: '7 Kas', speed: 260, test: 'Test 4' }
-    ],
-    quizPerformance: {
-      totalQuestions: 10,
-      correctAnswers: 7,
-      accuracy: 70,
-      timeSpent: '12 dakika',
-      strongTopics: ['Kolay Seviye', 'Orta Seviye'],
-      weakTopics: ['Çok Zor Seviye']
-    },
-    weeklyGoals: {
-      videoWatched: true,
-      quizCompleted: true,
-      speedTest: true,
-      eyeExercises: 5,
-      homeworkDone: false
-    },
-    achievements: [
-      { name: 'İlk Hız Testi', date: '1 Kas 2024', icon: '🎯' },
-      { name: 'İlk Quiz Tamamlandı', date: '3 Kas 2024', icon: '📝' },
-      { name: 'Video İzlendi', date: '1 Kas 2024', icon: '🎥' },
-      { name: '5 Gün Egzersiz', date: '6 Kas 2024', icon: '💪' }
-    ]
-  };
+  // Kullanıcıya özel veri yükleme
+const [userStats, setUserStats] = useState(null);
 
+useEffect(() => {
+  if (user) {
+    // Her kullanıcı için ayrı veri
+    const savedStats = localStorage.getItem(`stats_${user.uid}`);
+    if (savedStats) {
+      setUserStats(JSON.parse(savedStats));
+    } else {
+      // İlk kez giriş yapan kullanıcı için varsayılan veri
+      const defaultStats = {
+        weeklyActivity: [
+          { week: 'Hafta 1', completed: 0 },
+          { week: 'Hafta 2', completed: 0 },
+          { week: 'Hafta 3', completed: 0 },
+          { week: 'Hafta 4', completed: 0 }
+        ],
+        readingSpeedHistory: [],
+        quizPerformance: {
+          totalQuestions: 0,
+          correctAnswers: 0,
+          accuracy: 0,
+          timeSpent: '0 dakika',
+          strongTopics: [],
+          weakTopics: []
+        },
+        weeklyGoals: {
+          videoWatched: false,
+          quizCompleted: false,
+          speedTest: false,
+          eyeExercises: 0,
+          homeworkDone: false
+        },
+        achievements: []
+      };
+      setUserStats(defaultStats);
+      localStorage.setItem(`stats_${user.uid}`, JSON.stringify(defaultStats));
+    }
+  }
+}, [user]);
   const quizData = [
     {
       id: 1,
