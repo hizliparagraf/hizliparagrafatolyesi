@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
+import { auth } from './firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const ReadingPlatform = () => {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -21,7 +23,13 @@ const ReadingPlatform = () => {
   const [videoProgress, setVideoProgress] = useState(0);
   const [videoCompleted, setVideoCompleted] = useState(false);
   const [showVideoNotes, setShowVideoNotes] = useState(false);
-
+// Auth states
+  const [user, setUser] = useState(null);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  
   const studentStats = {
     weeklyActivity: [
       { week: 'Hafta 1', completed: 75 },
@@ -214,6 +222,21 @@ const ReadingPlatform = () => {
     return () => clearInterval(interval);
   }, [isReading, startTime]);
 
+  // Firebase auth listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+        if (currentPage !== 'landing' && currentPage !== 'auth') {
+          setCurrentPage('landing');
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
   const formatTime = (ms) => {
     const seconds = Math.floor(ms / 1000);
     const milliseconds = Math.floor((ms % 1000) / 100);
@@ -278,7 +301,66 @@ const ReadingPlatform = () => {
     setQuizResults([]);
     setQuizCompleted(false);
   };
+// Kayıt fonksiyonu
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
 
+    try {
+      await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+      setAuthEmail('');
+      setAuthPassword('');
+      setCurrentPage('dashboard');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        setAuthError('Bu email adresi zaten kullanılıyor.');
+      } else if (error.code === 'auth/weak-password') {
+        setAuthError('Şifre en az 6 karakter olmalıdır.');
+      } else if (error.code === 'auth/invalid-email') {
+        setAuthError('Geçersiz email adresi.');
+      } else {
+        setAuthError('Kayıt sırasında bir hata oluştu: ' + error.message);
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Giriş fonksiyonu
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, authEmail, authPassword);
+      setAuthEmail('');
+      setAuthPassword('');
+      setCurrentPage('dashboard');
+    } catch (error) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        setAuthError('Email veya şifre hatalı.');
+      } else if (error.code === 'auth/invalid-email') {
+        setAuthError('Geçersiz email adresi.');
+      } else {
+        setAuthError('Giriş sırasında bir hata oluştu: ' + error.message);
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Çıkış fonksiyonu
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setCurrentPage('landing');
+    } catch (error) {
+      console.error('Çıkış hatası:', error);
+    }
+  };
+  
   const Logo = () => (
     <div className="flex items-center gap-2">
       <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -291,16 +373,16 @@ const ReadingPlatform = () => {
     </div>
   );
 
-  const LandingPage = () => (
+ const LandingPage = () => (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
       <header className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
           <button 
-            onClick={() => { setIsLoggedIn(true); setCurrentPage('dashboard'); }} 
+            onClick={() => setCurrentPage('auth')} 
             className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
           >
-            Giriş Yap
+            Giriş Yap / Kayıt Ol
           </button>
         </div>
       </header>
@@ -310,7 +392,7 @@ const ReadingPlatform = () => {
         </h1>
         <p className="text-xl text-gray-600 mb-8">8 haftalık interaktif program</p>
         <button 
-          onClick={() => { setIsLoggedIn(true); setCurrentPage('dashboard'); }} 
+          onClick={() => setCurrentPage('auth')} 
           className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700"
         >
           Hemen Başla
@@ -318,7 +400,7 @@ const ReadingPlatform = () => {
       </div>
     </div>
   );
-
+  
   const Dashboard = () => (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm p-4">
