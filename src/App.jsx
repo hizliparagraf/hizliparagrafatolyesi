@@ -401,8 +401,43 @@ const ReadingPlatform = () => {
     </div>
   );
 
-  const AuthPage = () => {
-    const [isLogin, setIsLogin] = useState(true);
+ const AuthPage = () => {
+    const [localIsLogin, setLocalIsLogin] = useState(true);
+    const [localEmail, setLocalEmail] = useState('');
+    const [localPassword, setLocalPassword] = useState('');
+    const [localError, setLocalError] = useState('');
+    const [localLoading, setLocalLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLocalError('');
+      setLocalLoading(true);
+
+      try {
+        if (localIsLogin) {
+          await signInWithEmailAndPassword(auth, localEmail, localPassword);
+        } else {
+          await createUserWithEmailAndPassword(auth, localEmail, localPassword);
+        }
+        setLocalEmail('');
+        setLocalPassword('');
+        setCurrentPage('dashboard');
+      } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+          setLocalError('Bu email adresi zaten kullanılıyor.');
+        } else if (error.code === 'auth/weak-password') {
+          setLocalError('Şifre en az 6 karakter olmalıdır.');
+        } else if (error.code === 'auth/invalid-email') {
+          setLocalError('Geçersiz email adresi.');
+        } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          setLocalError('Email veya şifre hatalı.');
+        } else {
+          setLocalError('Bir hata oluştu: ' + error.message);
+        }
+      } finally {
+        setLocalLoading(false);
+      }
+    };
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
@@ -412,23 +447,23 @@ const ReadingPlatform = () => {
               <Logo />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              {isLogin ? 'Giriş Yap' : 'Hesap Oluştur'}
+              {localIsLogin ? 'Giriş Yap' : 'Hesap Oluştur'}
             </h2>
             <p className="text-gray-600">
-              {isLogin 
+              {localIsLogin 
                 ? 'Hesabınıza giriş yapın' 
                 : 'Yeni hesap oluşturun ve başlayın'}
             </p>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <form onSubmit={isLogin ? handleLogin : handleRegister}>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">Email</label>
                 <input
                   type="email"
-                  value={authEmail}
-                  onChange={(e) => setAuthEmail(e.target.value)}
+                  value={localEmail}
+                  onChange={(e) => setLocalEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                   placeholder="ornek@email.com"
                   required
@@ -440,34 +475,34 @@ const ReadingPlatform = () => {
                 <label className="block text-gray-700 font-medium mb-2">Şifre</label>
                 <input
                   type="password"
-                  value={authPassword}
-                  onChange={(e) => setAuthPassword(e.target.value)}
+                  value={localPassword}
+                  onChange={(e) => setLocalPassword(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                   placeholder="En az 6 karakter"
                   required
                   minLength={6}
-                  autoComplete={isLogin ? "current-password" : "new-password"}
+                  autoComplete={localIsLogin ? "current-password" : "new-password"}
                 />
               </div>
 
-              {authError && (
+              {localError && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                  {authError}
+                  {localError}
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={authLoading}
+                disabled={localLoading}
                 className={`w-full py-3 rounded-lg font-semibold text-white transition ${
-                  authLoading 
+                  localLoading 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-indigo-600 hover:bg-indigo-700'
                 }`}
               >
-                {authLoading 
+                {localLoading 
                   ? 'İşlem yapılıyor...' 
-                  : isLogin ? 'Giriş Yap' : 'Hesap Oluştur'}
+                  : localIsLogin ? 'Giriş Yap' : 'Hesap Oluştur'}
               </button>
             </form>
 
@@ -475,14 +510,12 @@ const ReadingPlatform = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setIsLogin(!isLogin);
-                  setAuthError('');
-                  setAuthEmail('');
-                  setAuthPassword('');
+                  setLocalIsLogin(!localIsLogin);
+                  setLocalError('');
                 }}
                 className="text-indigo-600 hover:text-indigo-700 font-medium"
               >
-                {isLogin 
+                {localIsLogin 
                   ? 'Hesabınız yok mu? Kayıt olun' 
                   : 'Zaten hesabınız var mı? Giriş yapın'}
               </button>
