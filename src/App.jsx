@@ -811,4 +811,5 @@ return (
 }
 return <Dashboard />;
 };
-                                                                                                
+
+export default ReadingPlatform;                                                                                          
