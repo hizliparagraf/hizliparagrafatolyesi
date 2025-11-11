@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
-import { auth } from './firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const ReadingPlatform = () => {
   const [currentPage, setCurrentPage] = useState('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-  const [authMode, setAuthMode] = useState('login'); // 'login' veya 'register'
-  const [authEmail, setAuthEmail] = useState('');
-  const [authPassword, setAuthPassword] = useState('');
-  const [authError, setAuthError] = useState('');
-  const [authLoading, setAuthLoading] = useState(false);
   
   const [isReading, setIsReading] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -30,55 +22,42 @@ const ReadingPlatform = () => {
   const [videoCompleted, setVideoCompleted] = useState(false);
   const [showVideoNotes, setShowVideoNotes] = useState(false);
 
-  // Kullanıcıya özel veri yükleme
-const [userStats, setUserStats] = useState(null);
-
-useEffect(() => {
-  if (user) {
-    // Her kullanıcı için ayrı veri
-    const savedStats = localStorage.getItem(`stats_${user.uid}`);
-    if (savedStats) {
-      setUserStats(JSON.parse(savedStats));
-    } else {
-      // İlk kez giriş yapan kullanıcı için varsayılan veri
-      const defaultStats = {
-        weeklyActivity: [
-          { week: 'Hafta 1', completed: 0 },
-          { week: 'Hafta 2', completed: 0 },
-          { week: 'Hafta 3', completed: 0 },
-          { week: 'Hafta 4', completed: 0 }
-        ],
-        readingSpeedHistory: [],
-        quizPerformance: {
-          totalQuestions: 0,
-          correctAnswers: 0,
-          accuracy: 0,
-          timeSpent: '0 dakika',
-          strongTopics: [],
-          weakTopics: []
-        },
-        weeklyGoals: {
-          videoWatched: false,
-          quizCompleted: false,
-          speedTest: false,
-          eyeExercises: 0,
-          homeworkDone: false
-        },
-        achievements: []
-      };
-      setUserStats(defaultStats);
-      localStorage.setItem(`stats_${user.uid}`, JSON.stringify(defaultStats));
-    }
-  }
-}, [user]);
-  
-  // Veri kaydetme fonksiyonu
-  const saveUserStats = (newStats) => {
-    if (user) {
-      setUserStats(newStats);
-      localStorage.setItem(`stats_${user.uid}`, JSON.stringify(newStats));
-    }
+  const studentStats = {
+    weeklyActivity: [
+      { week: 'Hafta 1', completed: 75 },
+      { week: 'Hafta 2', completed: 0 },
+      { week: 'Hafta 3', completed: 0 },
+      { week: 'Hafta 4', completed: 0 }
+    ],
+    readingSpeedHistory: [
+      { date: '1 Kas', speed: 200, test: 'İlk Test' },
+      { date: '3 Kas', speed: 225, test: 'Test 2' },
+      { date: '5 Kas', speed: 245, test: 'Test 3' },
+      { date: '7 Kas', speed: 260, test: 'Test 4' }
+    ],
+    quizPerformance: {
+      totalQuestions: 10,
+      correctAnswers: 7,
+      accuracy: 70,
+      timeSpent: '12 dakika',
+      strongTopics: ['Kolay Seviye', 'Orta Seviye'],
+      weakTopics: ['Çok Zor Seviye']
+    },
+    weeklyGoals: {
+      videoWatched: true,
+      quizCompleted: true,
+      speedTest: true,
+      eyeExercises: 5,
+      homeworkDone: false
+    },
+    achievements: [
+      { name: 'İlk Hız Testi', date: '1 Kas 2024', icon: '🎯' },
+      { name: 'İlk Quiz Tamamlandı', date: '3 Kas 2024', icon: '📝' },
+      { name: 'Video İzlendi', date: '1 Kas 2024', icon: '🎥' },
+      { name: '5 Gün Egzersiz', date: '6 Kas 2024', icon: '💪' }
+    ]
   };
+
   const quizData = [
     {
       id: 1,
@@ -162,12 +141,12 @@ useEffect(() => {
         "Sosyal medya özgüven sorunlarına yol açar."
       ],
       correctAnswer: 2,
-      explanation: "Paragrafta hem olumlu hem olumsuz yönler anlatılıyor ve sonuçta 'kontrollü kullanım' önerisi yapılıyor. Ana fikir tüm paragraftan çıkarılmalıdır."
+      explanation: "Paragrafta hem olumlu hem olumsuz yönler anlatılıyor ve sonuçta 'kontrollü kullanım' önerisi yapılıyor."
     },
     {
       id: 7,
       difficulty: "Zor",
-      text: "Antik çağlardan bu yana insanlar, yıldızlara bakarak yön bulmuş, takvim oluşturmuş ve gelecekle ilgili tahminlerde bulunmuştur. Astronomi bilimi, evreni anlama çabasının ürünüdür. İnsanoğlu, evrendeki yerini anlamak ve bilinmeyene dair merakını gidermek için sürekli gökyüzüne bakmış, sorular sormuştur. Galileo'nun teleskopu icat etmesiyle başlayan modern astronomi, bugün uzay teleskopları ve Mars'a gönderilen araçlarla devam etmektedir. Uzayı keşfetme çabası, insan doğasının en temel özelliklerinden biri olan merak duygusunun bir yansımasıdır.",
+      text: "Antik çağlardan bu yana insanlar, yıldızlara bakarak yön bulmuş, takvim oluşturmuş ve gelecekle ilgili tahminlerde bulunmuştur. Astronomi bilimi, evreni anlama çabasının ürünüdür. İnsanoğlu, evrendeki yerini anlamak ve bilinmeyene dair merakını gidermek için sürekli gökyüzüne bakmış, sorular sormuştur. Galileo'nun teleskopu icat etmesiyle başlayan modern astronomi, bugün uzay teleskopları ve Mars'a gönderilen araçlarla devam etmektedir.",
       question: "Paragrafın ana fikri hangisidir?",
       options: [
         "İnsanlar antik çağdan beri astronomiyle ilgilenir.",
@@ -176,7 +155,7 @@ useEffect(() => {
         "Uzay keşfi insanlık için önemlidir."
       ],
       correctAnswer: 1,
-      explanation: "Ana fikir: 'evrendeki yerini anlamak ve merakını gidermek'. İlk ve son cümleler bu fikri destekler. 'Merak' kelimesi hem ortada hem sonda geçiyor."
+      explanation: "Ana fikir: 'evrendeki yerini anlamak ve merakını gidermek'. İlk ve son cümleler bu fikri destekler."
     },
     {
       id: 8,
@@ -190,12 +169,12 @@ useEffect(() => {
         "Ormanlar insanlara birçok fayda sağlar."
       ],
       correctAnswer: 2,
-      explanation: "Yazar önce ormanların faydalarını sıralıyor, sonunda asıl mesajını veriyor: 'korumak... geleceğimizi korumak'. Bu sonuç cümlesidir."
+      explanation: "Yazar önce ormanların faydalarını sıralıyor, sonunda asıl mesajını veriyor: 'korumak... geleceğimizi korumak'."
     },
     {
       id: 9,
       difficulty: "Çok Zor",
-      text: "Eleştirel düşünme, bir bilgiyi sorgusuz kabul etmek yerine, onu analiz etme ve değerlendirme yeteneğidir. Günümüzde yanlış bilginin hızla yayıldığı dijital ortamda, gördüğümüz her habere inanmak büyük yanılgılara yol açabilir. Bir bilginin doğruluğunu sorgulamak, kaynaklarını araştırmak ve farklı bakış açılarını değerlendirmek, bilinçli bir birey olmanın gereğidir. Okullar, öğrencilere sadece bilgi aktarmakla kalmamalı, onlara nasıl düşüneceklerini de öğretmelidir. Çünkü gelecekte başarılı olacak kişiler, en çok bilgi bilenler değil, bilgiyi doğru değerlendirebilen ve kullanabilen kişiler olacaktır.",
+      text: "Eleştirel düşünme, bir bilgiyi sorgusuz kabul etmek yerine, onu analiz etme ve değerlendirme yeteneğidir. Günümüzde yanlış bilginin hızla yayıldığı dijital ortamda, gördüğümüz her habere inanmak büyük yanılgılara yol açabilir. Bir bilginin doğruluğunu sorgulamak, kaynaklarını araştırmak ve farklı bakış açılarını değerlendirmek, bilinçli bir birey olmanın gereğidir.",
       question: "Bu paragrafın temel mesajı nedir?",
       options: [
         "Dijital ortamda yanlış bilgi çok yaygındır.",
@@ -204,12 +183,12 @@ useEffect(() => {
         "Gelecekte başarı için çok bilgi gerekir."
       ],
       correctAnswer: 1,
-      explanation: "Ana fikir ilk cümlede tanımlanıyor ve tüm paragraf 'neden önemli' açıklıyor. Son cümle de bu önemi pekiştiriyor."
+      explanation: "Ana fikir ilk cümlede tanımlanıyor ve tüm paragraf 'neden önemli' açıklıyor."
     },
     {
       id: 10,
       difficulty: "Çok Zor",
-      text: "İklim değişikliği, dünyamızın karşı karşıya olduğu en büyük tehditlerin başında gelir. Buzullar eriyor, deniz seviyeleri yükseliyor ve aşırı hava olayları sıklaşıyor. Bilim insanları onlarca yıldır uyarılarda bulunmasına rağmen, küresel ölçekte yeterli önlem alınmamıştır. Fosil yakıt kullanımı azaltılmalı, yenilenebilir enerji kaynaklarına geçilmeli ve orman tahribatı durdurulmalıdır. Ancak bireysel çabalar da önemlidir: su ve enerji tasarrufu, geri dönüşüm ve bilinçli tüketim gibi küçük adımlar, topluca büyük fark yaratabilir. Sorun büyük ama çözümsüz değil; herkesin üzerine düşeni yapması, gezegenimizi kurtarmak için şarttır.",
+      text: "İklim değişikliği, dünyamızın karşı karşıya olduğu en büyük tehditlerin başında gelir. Buzullar eriyor, deniz seviyeleri yükseliyor ve aşırı hava olayları sıklaşıyor. Bilim insanları onlarca yıldır uyarılarda bulunmasına rağmen, küresel ölçekte yeterli önlem alınmamıştır. Fosil yakıt kullanımı azaltılmalı, yenilenebilir enerji kaynaklarına geçilmeli ve orman tahribatı durdurulmalıdır.",
       question: "Bu paragrafın ana fikri en iyi hangisiyle ifade edilir?",
       options: [
         "İklim değişikliği dünyanın en büyük sorunudur.",
@@ -218,9 +197,13 @@ useEffect(() => {
         "Bireysel küçük adımlar büyük fark yaratabilir."
       ],
       correctAnswer: 2,
-      explanation: "Paragraf sorun + çözüm yapısında. Ana fikir sadece sorunu değil, çözümü de içermeli. C hem küresel hem bireysel çözümleri kapsıyor."
+      explanation: "Paragraf sorun + çözüm yapısında. Ana fikir sadece sorunu değil, çözümü de içermeli."
     }
   ];
+
+  const testText = `Eğitim, bireyin zihinsel, duygusal ve sosyal gelişimini destekleyen en önemli araçlardan biridir. İyi bir eğitim sistemi, öğrencilerin sadece bilgi edinmesini değil, aynı zamanda eleştirel düşünme, problem çözme ve yaratıcılık becerilerini de geliştirmesini sağlar. Günümüz dünyasında hızla değişen teknoloji ve iş dünyası koşulları, eğitim sistemlerinin de sürekli yenilenmesini gerektirmektedir. Öğrencilere 21. yüzyıl becerileri kazandırılması, onların gelecekte başarılı bireyler olması için kritik öneme sahiptir.`;
+  const wordCount = testText.split(' ').length;
+
   useEffect(() => {
     let interval;
     if (isReading && startTime) {
@@ -230,20 +213,7 @@ useEffect(() => {
     }
     return () => clearInterval(interval);
   }, [isReading, startTime]);
-  
-useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-        setCurrentPage('landing');
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-  
+
   const formatTime = (ms) => {
     const seconds = Math.floor(ms / 1000);
     const milliseconds = Math.floor((ms % 1000) / 100);
@@ -269,22 +239,6 @@ useEffect(() => {
     setCurrentResult(result);
     setReadingResults([...readingResults, result]);
     setShowResult(true);
-    // Kullanıcı verisini güncelle
-  if (user && userStats) {
-    const updatedStats = {
-      ...userStats,
-      readingSpeedHistory: [...userStats.readingSpeedHistory, {
-        date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
-        speed: wpm,
-        test: `Test ${userStats.readingSpeedHistory.length + 1}`
-      }],
-      weeklyGoals: {
-        ...userStats.weeklyGoals,
-        speedTest: true
-      }
-    };
-    saveUserStats(updatedStats);
-  }
   };
 
   const resetTest = () => {
@@ -314,27 +268,6 @@ useEffect(() => {
       setShowExplanation(false);
     } else {
       setQuizCompleted(true);
-      // Quiz tamamlandı - sonuçları kaydet
-    if (user && userStats) {
-      const correctCount = quizResults.filter(r => r.correct).length;
-      const updatedStats = {
-        ...userStats,
-        quizPerformance: {
-          totalQuestions: quizData.length,
-          correctAnswers: correctCount,
-          accuracy: Math.round((correctCount / quizData.length) * 100),
-          timeSpent: '12 dakika',
-          strongTopics: correctCount >= 7 ? ['Ana Fikir Bulma'] : [],
-          weakTopics: correctCount < 7 ? ['Ana Fikir Bulma'] : []
-        },
-        weeklyGoals: {
-          ...userStats.weeklyGoals,
-          quizCompleted: true
-        }
-      };
-      saveUserStats(updatedStats);
-    }
-
     }
   };
 
@@ -346,163 +279,6 @@ useEffect(() => {
     setQuizCompleted(false);
   };
 
-  // Kayıt fonksiyonu
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthLoading(true);
-
-    try {
-      await createUserWithEmailAndPassword(auth, authEmail, authPassword);
-      setAuthEmail('');
-      setAuthPassword('');
-      setCurrentPage('dashboard');
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        setAuthError('Bu email adresi zaten kullanılıyor.');
-      } else if (error.code === 'auth/weak-password') {
-        setAuthError('Şifre en az 6 karakter olmalıdır.');
-      } else if (error.code === 'auth/invalid-email') {
-        setAuthError('Geçersiz email adresi.');
-      } else {
-        setAuthError('Kayıt sırasında bir hata oluştu.');
-      }
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  // Giriş fonksiyonu
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthLoading(true);
-
-    try {
-      await signInWithEmailAndPassword(auth, authEmail, authPassword);
-      setAuthEmail('');
-      setAuthPassword('');
-      setCurrentPage('dashboard');
-    } catch (error) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        setAuthError('Email veya şifre hatalı.');
-      } else if (error.code === 'auth/invalid-email') {
-        setAuthError('Geçersiz email adresi.');
-      } else {
-        setAuthError('Giriş sırasında bir hata oluştu.');
-      }
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  // Çıkış fonksiyonu
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setCurrentPage('landing');
-    } catch (error) {
-      console.error('Çıkış hatası:', error);
-    }
-  };
-  // Auth Page Component
-  const AuthPageContent = () => {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <Logo />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              {authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
-            </h2>
-            <p className="text-gray-600">
-              {authMode === 'login' 
-                ? 'Hesabınıza giriş yapın' 
-                : 'Yeni hesap oluşturun ve başlayın'}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <form onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  value={authEmail}
-                  onChange={(e) => setAuthEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                  placeholder="ornek@email.com"
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-gray-700 font-medium mb-2">Şifre</label>
-                <input
-                  type="password"
-                  value={authPassword}
-                  onChange={(e) => setAuthPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                  placeholder="En az 6 karakter"
-                  required
-                  minLength={6}
-                  autoComplete="current-password"
-                />
-              </div>
-
-              {authError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                  {authError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className={`w-full py-3 rounded-lg font-semibold text-white transition ${
-                  authLoading 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-indigo-600 hover:bg-indigo-700'
-                }`}
-              >
-                {authLoading 
-                  ? 'İşlem yapılıyor...' 
-                  : authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode(authMode === 'login' ? 'register' : 'login');
-                  setAuthError('');
-                }}
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
-              >
-                {authMode === 'login' 
-                  ? 'Hesabınız yok mu? Kayıt olun' 
-                  : 'Zaten hesabınız var mı? Giriş yapın'}
-              </button>
-            </div>
-
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={() => setCurrentPage('landing')}
-                className="text-gray-600 hover:text-gray-700"
-              >
-                ← Ana Sayfaya Dön
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
   const Logo = () => (
     <div className="flex items-center gap-2">
       <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -515,16 +291,16 @@ useEffect(() => {
     </div>
   );
 
-const LandingPage = () => (
+  const LandingPage = () => (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
       <header className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
           <button 
-            onClick={() => setCurrentPage('auth')} 
+            onClick={() => { setIsLoggedIn(true); setCurrentPage('dashboard'); }} 
             className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
           >
-            Giriş Yap / Kayıt Ol
+            Giriş Yap
           </button>
         </div>
       </header>
@@ -534,7 +310,7 @@ const LandingPage = () => (
         </h1>
         <p className="text-xl text-gray-600 mb-8">8 haftalık interaktif program</p>
         <button 
-          onClick={() => setCurrentPage('auth')} 
+          onClick={() => { setIsLoggedIn(true); setCurrentPage('dashboard'); }} 
           className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700"
         >
           Hemen Başla
@@ -542,119 +318,20 @@ const LandingPage = () => (
       </div>
     </div>
   );
-  const AuthPage = () => (
-  <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
-    <div className="max-w-md w-full">
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-6">
-          <Logo />
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          {authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
-        </h2>
-        <p className="text-gray-600">
-          {authMode === 'login' 
-            ? 'Hesabınıza giriş yapın' 
-            : 'Yeni hesap oluşturun ve başlayın'}
-        </p>
-      </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <form onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">Email</label>
-            <input
-              type="email"
-              value={authEmail}
-              onChange={(e) => setAuthEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-              placeholder="ornek@email.com"
-              required
-              autoComplete="email"
-            />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-2">Şifre</label>
-            <input
-              type="password"
-              value={authPassword}
-              onChange={(e) => setAuthPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-              placeholder="En az 6 karakter"
-              required
-              minLength={6}
-              autoComplete="current-password"
-            />
-          </div>
-
-          {authError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {authError}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={authLoading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition ${
-              authLoading 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700'
-            }`}
-          >
-            {authLoading 
-              ? 'İşlem yapılıyor...' 
-              : authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode(authMode === 'login' ? 'register' : 'login');
-              setAuthError('');
-            }}
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
-            {authMode === 'login' 
-              ? 'Hesabınız yok mu? Kayıt olun' 
-              : 'Zaten hesabınız var mı? Giriş yapın'}
-          </button>
-        </div>
-
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={() => setCurrentPage('landing')}
-            className="text-gray-600 hover:text-gray-700"
-          >
-            ← Ana Sayfaya Dön
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
   const Dashboard = () => (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
-          <div className="flex items-center gap-4">
-  {user && (
-    <span className="text-gray-700 text-sm">{user.email}</span>
-  )}
-  <button onClick={handleLogout} className="text-red-600 hover:text-red-700">
-    <LogOut size={20} />
-  </button>
-</div>
+          <button onClick={() => { setIsLoggedIn(false); setCurrentPage('landing'); }} className="text-red-600 hover:text-red-700">
+            <LogOut size={20} />
+          </button>
         </div>
       </nav>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Hoş Geldiniz!</h1>
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-4 gap-6">
           <button onClick={() => setCurrentPage('video')} className="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 rounded-xl shadow-lg hover:shadow-xl transition text-left text-white">
             <Video className="mb-4" size={40} />
             <h3 className="text-xl font-bold mb-2">Video Ders</h3>
@@ -737,480 +414,400 @@ const LandingPage = () => (
                 <p className="text-gray-600">Soru {currentQuestion + 1} / {quizData.length}</p>
               </div>
               <span className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-                currentQ.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                currentQ.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' : 
+                currentQ.difficulty === 'Orta' ? 'bg-orange-100 text-orange-700' :
+                currentQ.difficulty === 'Zor' ? 'bg-red-100 text-red-700' :
+                'bg-purple-100 text-purple-700'
               }`}>
                 {currentQ.difficulty}
               </span>
             </div>
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 rounded">
-              <p className="text-gray-800 leading-relaxed text-lg">{currentQ.text}</p>
-            </div>
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">{currentQ.question}</h3>
-              <div className="space-y-3">
-                {currentQ.options.map((option, idx) => {
-                  const isSelected = selectedAnswer === idx;
-                  const isCorrect = idx === currentQ.correctAnswer;
-                  const showStatus = showExplanation;
-                  let bgColor = 'bg-white hover:bg-gray-50';
-                  let borderColor = 'border-gray-300';
-                  let icon = null;
-                  if (showStatus) {
-                    if (isCorrect) {
-                      bgColor = 'bg-green-50';
-                      borderColor = 'border-green-500';
-                      icon = <Check className="text-green-600" size={20} />;
-                    } else if (isSelected && !isCorrect) {
-                      bgColor = 'bg-red-50';
-                      borderColor = 'border-red-500';
-                      icon = <X className="text-red-600" size={20} />;
-                    }
-                  } else if (isSelected) {
-                    bgColor = 'bg-indigo-50';
-                    borderColor = 'border-indigo-500';
-                  }
-                  return (
-                    <button key={idx} onClick={() => handleAnswerSelect(idx)} disabled={showExplanation} className={`w-full text-left p-4 border-2 ${borderColor} ${bgColor} rounded-lg transition flex items-center justify-between`}>
-                      <span className="text-gray-800">{String.fromCharCode(65 + idx)}) {option}</span>
-                      {icon}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            {showExplanation && (
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-6 rounded">
-                <h4 className="font-bold text-gray-900 mb-2">Açıklama:</h4>
-                <p className="text-gray-700">{currentQ.explanation}</p>
-              </div>
-            )}
-            <div className="flex justify-between">
-              <button onClick={() => setCurrentPage('dashboard')} className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
-                <Home size={20} />Ana Sayfa
-              </button>
-              <div className="flex gap-3">
-                {!showExplanation ? (
-                  <button onClick={handleCheckAnswer} disabled={selectedAnswer === null} className={`px-8 py-3 rounded-lg font-semibold ${selectedAnswer === null ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}>
-                    Cevabı Kontrol Et
-                  </button>
-                ) : (
-                  <button onClick={handleNextQuestion} className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">
-                    {currentQuestion < quizData.length - 1 ? 'Sonraki Soru' : 'Sonuçları Gör'}
-                    <ChevronRight size={20} />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  if (!isLoggedIn && currentPage === 'landing') return <LandingPage />;
-  if (currentPage === 'auth') return <AuthPage />;
-  if (currentPage === 'quiz') return <QuizPage />;
-  if (currentPage === 'test') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm p-4">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <Logo />
-            <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline">← Dashboard</button>
-          </div>
-        </nav>
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h1 className="text-3xl font-bold mb-6">Okuma Hızı Testi</h1>
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-4 bg-gray-100 px-8 py-4 rounded-lg">
-                <Clock className="text-indigo-600" size={32} />
-                <div className="text-4xl font-bold">{formatTime(elapsedTime)}</div>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-lg mb-8">
-              <p className="text-lg leading-relaxed">{testText}</p>
-            </div>
-            <div className="flex gap-4 justify-center">
-              {!isReading && !showResult && (
-                <button onClick={startReading} className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700">
-                  <Play size={24} />Teste Başla
-                </button>
-              )}
-              {isReading && (
-                <button onClick={stopReading} className="flex items-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700">
-                  <Pause size={24} />Testi Bitir
-                </button>
-              )}
-              {(isReading || showResult) && (
-                <button onClick={resetTest} className="flex items-center gap-2 bg-gray-600 text-white px-6 py-4 rounded-lg hover:bg-gray-700">
-                  <RotateCcw size={20} />Sıfırla
-                </button>
-              )}
-            </div>
-            {showResult && currentResult && (
-              <div className="mt-8 bg-green-50 border-2 border-green-200 rounded-xl p-8 text-center">
-                <Award className="inline-block text-green-600 mb-4" size={64} />
-                <h2 className="text-2xl font-bold mb-4">Test Tamamlandı!</h2>
-                <div className="text-5xl font-bold text-indigo-600 mb-2">{currentResult.wpm}</div>
-                <div className="text-gray-600">kelime/dakika</div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
- if (currentPage === 'video') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm p-4">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <Logo />
-            <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
-              <Home size={20} />
-              Dashboard
-            </button>
-          </div>
-        </nav>
-
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
-                      Hafta 1
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock size={16} />
-                      25 dakika
-                    </div>
-                  </div>
-                  <h1 className="text-3xl font-bold mb-2">Temeller ve Farkındalık</h1>
-                  <p className="opacity-90">Hızlı okuma yolculuğunuzun ilk adımı</p>
-                </div>
-
-                <div className="relative bg-black aspect-video">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Video size={64} className="mx-auto mb-4 opacity-50" />
-                      <p className="text-lg mb-4">Video Player</p>
-                      <p className="text-sm opacity-75">Gerçek videolar yüklendikinde burada görünecek</p>
-                      <button 
-                        onClick={() => {
-                          setVideoProgress(100);
-                          setVideoCompleted(true);
-                        }}
-                        className="mt-4 bg-indigo-600 px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
-                      >
-                        Demo: Videoyu Tamamlandı Say
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">İzleme İlerlemesi</span>
-                    <span className="text-sm font-bold text-indigo-600">{videoProgress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${videoProgress}%` }}
-                    ></div>
-                  </div>
-                  {videoCompleted && (
-                    <div className="mt-4 flex items-center gap-2 text-green-600">
-                      <CheckCircle size={20} />
-                      <span className="font-medium">Video tamamlandı! 🎉</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="border-b">
-                  <div className="flex">
-                    <button 
-                      onClick={() => setShowVideoNotes(false)}
-                      className={`px-6 py-3 font-medium border-b-2 transition ${
-                        !showVideoNotes 
-                          ? 'border-indigo-600 text-indigo-600' 
-                          : 'border-transparent text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      Genel Bakış
-                    </button>
-                    <button 
-                      onClick={() => setShowVideoNotes(true)}
-                      className={`px-6 py-3 font-medium border-b-2 transition ${
-                        showVideoNotes 
-                          ? 'border-indigo-600 text-indigo-600' 
-                          : 'border-transparent text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      Ders Notları
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  {!showVideoNotes ? (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3">Bu Derste Neler Öğreneceksiniz?</h3>
-                        <ul className="space-y-2">
-                          {[
-                            "Okuma Hızı Testi - Teori ve Uygulama",
-                            "Yavaş Okuma Nedenleri",
-                            "Göz Hareketleri Egzersizleri",
-                            "Paragraf Yapısı",
-                            "Ana Fikir Bulma Teknikleri"
-                          ].map((topic, idx) => (
-                            <li key={idx} className="flex items-start gap-3">
-                              <div className="mt-1 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                                <span className="text-indigo-600 text-sm font-bold">{idx + 1}</span>
-                              </div>
-                              <span className="text-gray-700">{topic}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3">Bu Hafta Yapılacaklar</h3>
-                        <div className="space-y-2">
-                          {[
-                            "Okuma hızı testi yapın (2 kez)",
-                            "Göz egzersizleri: Günde 5 dakika, 7 gün",
-                            "10 paragrafta ana fikir bulma pratikleri",
-                            "Alışkanlık takip formu doldurun"
-                          ].map((task, idx) => (
-                            <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                              <Circle className="text-gray-400 flex-shrink-0 mt-0.5" size={18} />
-                              <span className="text-gray-700">{task}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="prose max-w-none">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">Hafta 1 - Detaylı Ders Notları</h3>
-                      
-                      <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                        <p className="font-semibold text-blue-900 mb-2">📝 Not Alma İpucu</p>
-                        <p className="text-blue-800 text-sm">
-                          Bu notları yazdırıp yanınızda bulundurabilir, önemli yerlerin altını çizebilirsiniz.
-                        </p>
-                      </div>
-
-                      <h4 className="text-lg font-bold mt-6 mb-3">1. Okuma Hızı Nasıl Ölçülür?</h4>
-                      <p className="text-gray-700 mb-4">
-                        Okuma hızınızı ölçmek için basit bir formül kullanıyoruz:
-                      </p>
-                      <div className="bg-gray-100 p-4 rounded-lg mb-4 font-mono text-center">
-                        (Kelime Sayısı ÷ Okuma Süresi (saniye)) × 60 = Kelime/Dakika
-                      </div>
-
-                      <h4 className="text-lg font-bold mt-6 mb-3">2. Sizi Yavaşlatan 5 Alışkanlık</h4>
-                      <div className="space-y-3">
-                        <div className="border-l-4 border-red-500 pl-4">
-                          <h5 className="font-bold text-gray-900">Alt Seslendirme</h5>
-                          <p className="text-gray-700 text-sm">
-                            Okuduğunuz kelimeleri içinizden telaffuz etme. Konuşma hızınızla sınırlı kalırsınız.
-                          </p>
-                        </div>
-                        <div className="border-l-4 border-red-500 pl-4">
-                          <h5 className="font-bold text-gray-900">Geri Dönüş</h5>
-                          <p className="text-gray-700 text-sm">
-                            Okuduğunuz yere tekrar tekrar dönme. Güvensizlik ve yavaşlığa neden olur.
-                          </p>
-                        </div>
-                      </div>
-
-                      <h4 className="text-lg font-bold mt-6 mb-3">3. Göz Egzersizleri</h4>
-                      <p className="text-gray-700 mb-3">
-                        Her gün 5 dakika yapılması gereken 3 temel egzersiz:
-                      </p>
-                      <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                        <li><strong>Zigzag Takip:</strong> Parmağınızla zigzag çizerken sadece gözlerinizle takip edin</li>
-                        <li><strong>Yatay Genişleme:</strong> Bir satırın başını ve sonunu aynı anda görmeye çalışın</li>
-                        <li><strong>Dikey Atlama:</strong> Her satırın ortasına odaklanarak dikey inin</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <BarChart3 className="text-indigo-600" size={20} />
-                  İlerleme Durumu
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Video</span>
-                    <span className="text-sm font-bold">{videoCompleted ? '✓' : '○'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Ana Fikir Quiz</span>
-                    <span className="text-sm font-bold">○</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Hız Testi</span>
-                    <span className="text-sm font-bold">○</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-                <h3 className="font-bold mb-3">Sonraki Adım</h3>
-                <p className="text-sm opacity-90 mb-4">
-                  Videoyu izledikten sonra quiz'e geçin!
-                </p>
-                <button 
-                  onClick={() => setCurrentPage('quiz')}
-                  className="w-full bg-white text-indigo-600 py-2 rounded-lg font-semibold hover:bg-gray-100 transition"
-                >
-                  Quiz'e Başla →
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  if (currentPage === 'progress') {
-    const initialSpeed = studentStats.readingSpeedHistory[0].speed;
-    const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
-    const improvement = currentSpeed - initialSpeed;
-    const improvementPercent = Math.round((improvement / initialSpeed) * 100);
-
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm p-4">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <Logo />
-            <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
-              <Home size={20} />
-              Dashboard
-            </button>
-          </div>
-        </nav>
-
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">İlerleme & İstatistikler</h1>
-            <p className="text-gray-600">Gelişiminizi takip edin</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100">Mevcut Hız</span>
-                <TrendingUp size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">{currentSpeed}</div>
-              <div className="text-indigo-100 text-sm">kelime/dakika</div>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-green-100">Gelişim</span>
-                <Award size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">+{improvement}</div>
-              <div className="text-green-100 text-sm">kelime ({improvementPercent}% artış)</div>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-purple-100">Quiz Başarısı</span>
-                <CheckCircle size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">%{studentStats.quizPerformance.accuracy}</div>
-              <div className="text-purple-100 text-sm">{studentStats.quizPerformance.correctAnswers}/{studentStats.quizPerformance.totalQuestions} doğru</div>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-orange-100">Toplam Test</span>
-                <BarChart3 size={24} />
-              </div>
-              <div className="text-4xl font-bold mb-1">{studentStats.readingSpeedHistory.length}</div>
-              <div className="text-orange-100 text-sm">hız testi</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <TrendingUp className="text-indigo-600" />
-              Okuma Hızı Gelişimi
-            </h2>
             
-            <div className="space-y-4">
-              {studentStats.readingSpeedHistory.map((item, idx) => (
-                <div key={idx}>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">{item.test}</span>
-                    <span className="text-sm font-bold text-indigo-600">{item.speed} kelime/dk</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 w-16">{item.date}</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000"
-                        style={{ width: `${(item.speed / 400) * 100}%` }}
-                      >
-                        <span className="text-white text-xs font-bold">{item.speed}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
+              <div className="bg-indigo-600 h-2 rounded-full transition-all" style={{width: `${((currentQuestion + 1) / quizData.
+<div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 rounded">
+          <p className="text-gray-800 leading-relaxed text-lg">{currentQ.text}</p>
+        </div>
 
-            <div className="mt-6 pt-6 border-t">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Hedef: 400 kelime/dakika</span>
-                <span className="text-sm font-bold text-gray-900">{Math.round((currentSpeed/400)*100)}% tamamlandı</span>
-              </div>
-              <div className="bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all"
-                  style={{ width: `${(currentSpeed/400)*100}%` }}
-                ></div>
-              </div>
-            </div>
+        <div className="mb-8">
+          <h3 className="font-bold text-gray-900 mb-4 text-lg">{currentQ.question}</h3>
+          <div className="space-y-3">
+            {currentQ.options.map((option, idx) => {
+              const isSelected = selectedAnswer === idx;
+              const isCorrect = idx === currentQ.correctAnswer;
+              const showStatus = showExplanation;
+              let bgColor = 'bg-white hover:bg-gray-50';
+              let borderColor = 'border-gray-300';
+              let icon = null;
+
+              if (showStatus) {
+                if (isCorrect) {
+                  bgColor = 'bg-green-50';
+                  borderColor = 'border-green-500';
+                  icon = <Check className="text-green-600" size={20} />;
+                } else if (isSelected && !isCorrect) {
+                  bgColor = 'bg-red-50';
+                  borderColor = 'border-red-500';
+                  icon = <X className="text-red-600" size={20} />;
+                }
+              } else if (isSelected) {
+                bgColor = 'bg-indigo-50';
+                borderColor = 'border-indigo-500';
+              }
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswerSelect(idx)}
+                  disabled={showExplanation}
+                  className={`w-full text-left p-4 border-2 ${borderColor} ${bgColor} rounded-lg transition flex items-center justify-between`}
+                >
+                  <span className="text-gray-800">{String.fromCharCode(65 + idx)}) {option}</span>
+                  {icon}
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          <div className="mt-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-            <h3 className="text-2xl font-bold mb-3">🎉 Harika Gidiyorsun!</h3>
-            <p className="text-indigo-100 mb-4">
-              Okuma hızında {improvementPercent}% artış sağladın. Bu tempoyu koru!
-            </p>
-            <div className="bg-white/20 p-4 rounded-lg">
-              <p className="text-sm font-medium mb-2">Bir Sonraki Hedef:</p>
-              <p className="text-lg font-bold">300 kelime/dakika</p>
-              <div className="mt-2 bg-white/30 rounded-full h-2">
-                <div 
-                  className="bg-white h-2 rounded-full"
-                  style={{ width: `${(currentSpeed/300)*100}%` }}
-                ></div>
-              </div>
-            </div>
+        {showExplanation && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-6 rounded">
+            <h4 className="font-bold text-gray-900 mb-2">Açıklama:</h4>
+            <p className="text-gray-700">{currentQ.explanation}</p>
+          </div>
+        )}
+
+        <div className="flex justify-between">
+          <button
+            onClick={() => setCurrentPage('dashboard')}
+            className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+          >
+            <Home size={20} />
+            Ana Sayfa
+          </button>
+          <div className="flex gap-3">
+            {!showExplanation ? (
+              <button
+                onClick={handleCheckAnswer}
+                disabled={selectedAnswer === null}
+                className={`px-8 py-3 rounded-lg font-semibold ${
+                  selectedAnswer === null
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                }`}
+              >
+                Cevabı Kontrol Et
+              </button>
+            ) : (
+              <button
+                onClick={handleNextQuestion}
+                className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+              >
+                {currentQuestion < quizData.length - 1 ? 'Sonraki Soru' : 'Sonuçları Gör'}
+                <ChevronRight size={20} />
+              </button>
+            )}
           </div>
         </div>
       </div>
-    );
-  }
-  
-  return <Dashboard />;
-};
+    </div>
+  </div>
+);};
+const VideoPage = () => (
+<div className="min-h-screen bg-gray-50">
+<nav className="bg-white shadow-sm p-4">
+<div className="max-w-7xl mx-auto flex justify-between items-center">
+<Logo />
+<button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
+<Home size={20} />
+Dashboard
+</button>
+</div>
+</nav>
+  <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
+            Hafta 1
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock size={16} />
+            25 dakika
+          </div>
+        </div>
+        <h1 className="text-3xl font-bold mb-2">Temeller ve Farkındalık</h1>
+        <p className="opacity-90">Hızlı okuma yolculuğunuzun ilk adımı</p>
+      </div>
 
-export default ReadingPlatform;
+      <div className="relative bg-black aspect-video">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white">
+            <Video size={64} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg mb-4">Video Player</p>
+            <p className="text-sm opacity-75 mb-4">Gerçek videolar yüklendikinde burada görünecek</p>
+            <button 
+              onClick={() => {
+                setVideoProgress(100);
+                setVideoCompleted(true);
+              }}
+              className="bg-indigo-600 px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
+            >
+              Demo: Videoyu Tamamlandı Say
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 border-b">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">İzleme İlerlemesi</span>
+          <span className="text-sm font-bold text-indigo-600">{videoProgress}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div 
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+            style={{ width: `${videoProgress}%` }}
+          ></div>
+        </div>
+        {videoCompleted && (
+          <div className="mt-4 flex items-center gap-2 text-green-600">
+            <CheckCircle size={20} />
+            <span className="font-medium">Video tamamlandı! 🎉</span>
+          </div>
+        )}
+      </div>
+
+      <div className="border-b">
+        <div className="flex">
+          <button 
+            onClick={() => setShowVideoNotes(false)}
+            className={`px-6 py-3 font-medium border-b-2 transition ${
+              !showVideoNotes 
+                ? 'border-indigo-600 text-indigo-600' 
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Genel Bakış
+          </button>
+          <button 
+            onClick={() => setShowVideoNotes(true)}
+            className={`px-6 py-3 font-medium border-b-2 transition ${
+              showVideoNotes 
+                ? 'border-indigo-600 text-indigo-600' 
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Ders Notları
+          </button>
+        </div>
+      </div>
+
+      <div className="p-6">
+        {!showVideoNotes ? (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-3">Bu Derste Neler Öğreneceksiniz?</h3>
+              <ul className="space-y-2">
+                {[
+                  "Okuma Hızı Testi - Teori ve Uygulama",
+                  "Yavaş Okuma Nedenleri",
+                  "Göz Hareketleri Egzersizleri",
+                  "Paragraf Yapısı",
+                  "Ana Fikir Bulma Teknikleri"
+                ].map((topic, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="mt-1 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                      <span className="text-indigo-600 text-sm font-bold">{idx + 1}</span>
+                    </div>
+                    <span className="text-gray-700">{topic}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <div className="prose max-w-none">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Hafta 1 - Detaylı Ders Notları</h3>
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+              <p className="font-semibold text-blue-900 mb-2">📝 Not Alma İpucu</p>
+              <p className="text-blue-800 text-sm">
+                Bu notları yazdırıp yanınızda bulundurabilir, önemli yerlerin altını çizebilirsiniz.
+              </p>
+            </div>
+            <h4 className="text-lg font-bold mt-6 mb-3">1. Okuma Hızı Nasıl Ölçülür?</h4>
+            <p className="text-gray-700 mb-4">
+              Okuma hızınızı ölçmek için basit bir formül kullanıyoruz:
+            </p>
+            <div className="bg-gray-100 p-4 rounded-lg mb-4 font-mono text-center">
+              (Kelime Sayısı ÷ Okuma Süresi (saniye)) × 60 = Kelime/Dakika
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>);
+const ProgressPage = () => {
+const initialSpeed = studentStats.readingSpeedHistory[0].speed;
+const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
+const improvement = currentSpeed - initialSpeed;
+const improvementPercent = Math.round((improvement / initialSpeed) * 100);
+  return (
+  <div className="min-h-screen bg-gray-50">
+    <nav className="bg-white shadow-sm p-4">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <Logo />
+        <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
+          <Home size={20} />
+          Dashboard
+        </button>
+      </div>
+    </nav>
+
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">İlerleme & İstatistikler</h1>
+        <p className="text-gray-600">Gelişiminizi takip edin</p>
+      </div>
+
+      <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-indigo-100">Mevcut Hız</span>
+            <TrendingUp size={24} />
+          </div>
+          <div className="text-4xl font-bold mb-1">{currentSpeed}</div>
+          <div className="text-indigo-100 text-sm">kelime/dakika</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-green-100">Gelişim</span>
+            <Award size={24} />
+          </div>
+          <div className="text-4xl font-bold mb-1">+{improvement}</div>
+          <div className="text-green-100 text-sm">kelime ({improvementPercent}% artış)</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-purple-100">Quiz Başarısı</span>
+            <CheckCircle size={24} />
+          </div>
+          <div className="text-4xl font-bold mb-1">%{studentStats.quizPerformance.accuracy}</div>
+          <div className="text-purple-100 text-sm">{studentStats.quizPerformance.correctAnswers}/{studentStats.quizPerformance.totalQuestions} doğru</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-orange-100">Toplam Test</span>
+            <BarChart3 size={24} />
+          </div>
+          <div className="text-4xl font-bold mb-1">{studentStats.readingSpeedHistory.length}</div>
+          <div className="text-orange-100 text-sm">hız testi</div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <TrendingUp className="text-indigo-600" />
+          Okuma Hızı Gelişimi
+        </h2>
+        
+        <div className="space-y-4">
+          {studentStats.readingSpeedHistory.map((item, idx) => (
+            <div key={idx}>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">{item.test}</span>
+                <span className="text-sm font-bold text-indigo-600">{item.speed} kelime/dk</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-500 w-16">{item.date}</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000"
+                    style={{ width: `${(item.speed / 400) * 100}%` }}
+                  >
+                    <span className="text-white text-xs font-bold">{item.speed}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 pt-6 border-t">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-600">Hedef: 400 kelime/dakika</span>
+            <span className="text-sm font-bold text-gray-900">{Math.round((currentSpeed/400)*100)}% tamamlandı</span>
+          </div>
+          <div className="bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-green-500 h-2 rounded-full transition-all"
+              style={{ width: `${(currentSpeed/400)*100}%` }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);};
+if (!isLoggedIn && currentPage === 'landing') return <LandingPage />;
+if (currentPage === 'quiz') return <QuizPage />;
+if (currentPage === 'video') return <VideoPage />;
+if (currentPage === 'progress') return <ProgressPage />;
+if (currentPage === 'test') {
+return (
+<div className="min-h-screen bg-gray-50">
+<nav className="bg-white shadow-sm p-4">
+<div className="max-w-4xl mx-auto flex justify-between items-center">
+<Logo />
+<button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline">← Dashboard</button>
+</div>
+</nav>
+<div className="max-w-4xl mx-auto px-4 py-8">
+<div className="bg-white rounded-xl shadow-lg p-8">
+<h1 className="text-3xl font-bold mb-6">Okuma Hızı Testi</h1>
+<div className="text-center mb-8">
+<div className="inline-flex items-center gap-4 bg-gray-100 px-8 py-4 rounded-lg">
+<Clock className="text-indigo-600" size={32} />
+<div className="text-4xl font-bold">{formatTime(elapsedTime)}</div>
+</div>
+</div>
+<div className="bg-gray-50 p-8 rounded-lg mb-8">
+<p className="text-lg leading-relaxed">{testText}</p>
+</div>
+<div className="flex gap-4 justify-center">
+{!isReading && !showResult && (
+<button onClick={startReading} className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700">
+<Play size={24} />Teste Başla
+</button>
+)}
+{isReading && (
+<button onClick={stopReading} className="flex items-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700">
+<Pause size={24} />Testi Bitir
+</button>
+)}
+{(isReading || showResult) && (
+<button onClick={resetTest} className="flex items-center gap-2 bg-gray-600 text-white px-6 py-4 rounded-lg hover:bg-gray-700">
+<RotateCcw size={20} />Sıfırla
+</button>
+)}
+</div>
+{showResult && currentResult && (
+<div className="mt-8 bg-green-50 border-2 border-green-200 rounded-xl p-8 text-center">
+<Award className="inline-block text-green-600 mb-4" size={64} />
+<h2 className="text-2xl font-bold mb-4">Test Tamamlandı!</h2>
+<div className="text-5xl font-bold text-indigo-600 mb-2">{currentResult.wpm}</div>
+<div className="text-gray-600">kelime/dakika</div>
+</div>
+)}
+</div>
+</div>
+</div>
+);
+}
+return <Dashboard />;
+};
+                                                                                                
