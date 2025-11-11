@@ -424,7 +424,8 @@ const ReadingPlatform = () => {
             </div>
             
             <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
-              <div className="bg-indigo-600 h-2 rounded-full transition-all" style={{width: `${((currentQuestion + 1) / quizData.
+              <div className="bg-indigo-600 h-2 rounded-full transition-all" style={{width: `${((currentQuestion + 1) / quizData.length) * 100}%`}}></div>
+</div>
 <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 rounded">
           <p className="text-gray-800 leading-relaxed text-lg">{currentQ.text}</p>
         </div>
