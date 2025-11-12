@@ -31,7 +31,7 @@ const ReadingPlatform = () => {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   
-  const stats = {
+  const studentStats = {
     weeklyActivity: [
       { week: 'Hafta 1', completed: 75 },
       { week: 'Hafta 2', completed: 0 },
@@ -1014,8 +1014,8 @@ const ProgressPage = () => {
             <span className="text-purple-100">Quiz Başarısı</span>
             <CheckCircle size={24} />
           </div>
-          <div className="text-4xl font-bold mb-1">%{stats.quizPerformance.accuracy}</div>
-          <div className="text-purple-100 text-sm">{stats.quizPerformance.correctAnswers}/{stats.quizPerformance.totalQuestions} doğru</div>
+          <div className="text-4xl font-bold mb-1">%{studentStats.quizPerformance.accuracy}</div>
+          <div className="text-purple-100 text-sm">{studentStats.quizPerformance.correctAnswers}/{studentStats.quizPerformance.totalQuestions} doğru</div>
         </div>
 
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
@@ -1023,7 +1023,7 @@ const ProgressPage = () => {
             <span className="text-orange-100">Toplam Test</span>
             <BarChart3 size={24} />
           </div>
-          <div className="text-4xl font-bold mb-1">{stats.readingSpeedHistory.length}</div>
+          <div className="text-4xl font-bold mb-1">{studentStats.readingSpeedHistory.length}</div>
           <div className="text-orange-100 text-sm">hız testi</div>
         </div>
       </div>
@@ -1035,7 +1035,7 @@ const ProgressPage = () => {
         </h2>
         
         <div className="space-y-4">
-          {stats.readingSpeedHistory.map((item, idx) => (
+          {studentStats.readingSpeedHistory.map((item, idx) => (
             <div key={idx}>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">{item.test}</span>
