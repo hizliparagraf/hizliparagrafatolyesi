@@ -1012,8 +1012,8 @@ const ProgressPage = () => {
   const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
 
   return (
-const initialSpeed = studentStats.readingSpeedHistory[0].speed;
-const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
+const initialSpeed = stats.readingSpeedHistory[0].speed;
+const currentSpeed = stats.readingSpeedHistory[stats.readingSpeedHistory.length - 1].speed;
 const improvement = currentSpeed - initialSpeed;
 const improvementPercent = Math.round((improvement / initialSpeed) * 100);
   return (
@@ -1058,8 +1058,8 @@ const improvementPercent = Math.round((improvement / initialSpeed) * 100);
             <span className="text-purple-100">Quiz Başarısı</span>
             <CheckCircle size={24} />
           </div>
-          <div className="text-4xl font-bold mb-1">%{studentStats.quizPerformance.accuracy}</div>
-          <div className="text-purple-100 text-sm">{studentStats.quizPerformance.correctAnswers}/{studentStats.quizPerformance.totalQuestions} doğru</div>
+          <div className="text-4xl font-bold mb-1">%{stats.quizPerformance.accuracy}</div>
+          <div className="text-purple-100 text-sm">{stats.quizPerformance.correctAnswers}/{stats.quizPerformance.totalQuestions} doğru</div>
         </div>
 
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
@@ -1067,7 +1067,7 @@ const improvementPercent = Math.round((improvement / initialSpeed) * 100);
             <span className="text-orange-100">Toplam Test</span>
             <BarChart3 size={24} />
           </div>
-          <div className="text-4xl font-bold mb-1">{studentStats.readingSpeedHistory.length}</div>
+          <div className="text-4xl font-bold mb-1">{stats.readingSpeedHistory.length}</div>
           <div className="text-orange-100 text-sm">hız testi</div>
         </div>
       </div>
@@ -1079,7 +1079,7 @@ const improvementPercent = Math.round((improvement / initialSpeed) * 100);
         </h2>
         
         <div className="space-y-4">
-          {studentStats.readingSpeedHistory.map((item, idx) => (
+          {stats.readingSpeedHistory.map((item, idx) => (
             <div key={idx}>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">{item.test}</span>
