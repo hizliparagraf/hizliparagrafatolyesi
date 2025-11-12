@@ -1012,7 +1012,6 @@ const ProgressPage = () => {
   const improvement = currentSpeed - initialSpeed;
   const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
 
-  return (
 const initialSpeed = stats.readingSpeedHistory[0].speed;
 const currentSpeed = stats.readingSpeedHistory[stats.readingSpeedHistory.length - 1].speed;
 const improvement = currentSpeed - initialSpeed;
