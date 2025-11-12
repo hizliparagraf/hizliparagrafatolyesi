@@ -957,14 +957,7 @@ const ProgressPage = () => {
       { week: 'Hafta 2', completed: 0 },
       { week: 'Hafta 3', completed: 0 },
       { week: 'Hafta 4', completed: 0 }
-    ],
-    weeklyGoals: {
-      videoWatched: false,
-      quizCompleted: false,
-      speedTest: false,
-      eyeExercises: 0,
-      homeworkDone: false
-    }
+    ]
   };
 
   // Quiz istatistikleri
@@ -972,11 +965,11 @@ const ProgressPage = () => {
     ? stats.quizResults[stats.quizResults.length - 1]
     : { totalQuestions: 0, correctAnswers: 0, accuracy: 0 };
 
-  // Okuma hızı hesapla
+  // Okuma hızı
   const readingHistory = stats.readingSpeedHistory || [];
   const hasHistory = readingHistory.length > 0;
-  const initialSpeed = hasHistory ? readingHistory[0].speed : 0;
-  const currentSpeed = hasHistory ? readingHistory[readingHistory.length - 1].speed : 0;
+  const initialSpeed = hasHistory ? readingHistory[0].speed : 200;
+  const currentSpeed = hasHistory ? readingHistory[readingHistory.length - 1].speed : 200;
   const improvement = currentSpeed - initialSpeed;
   const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
 
@@ -998,9 +991,122 @@ const ProgressPage = () => {
           <p className="text-gray-600">Gelişiminizi takip edin</p>
         </div>
 
-        {/* Eğer veri yoksa bilgi göster */}
-        {!hasHistory && latestQuiz.totalQuestions === 0 && (
-          <div className="bg-blue
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-indigo-100">Mevcut Hız</span>
+              <TrendingUp size={24} />
+            </div>
+            <div className="text-4xl font-bold mb-1">{currentSpeed}</div>
+            <div className="text-indigo-100 text-sm">kelime/dakika</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-green-100">Gelişim</span>
+              <Award size={24} />
+            </div>
+            <div className="text-4xl font-bold mb-1">+{improvement}</div>
+            <div className="text-green-100 text-sm">kelime ({improvementPercent}% artış)</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-purple-100">Quiz Başarısı</span>
+              <CheckCircle size={24} />
+            </div>
+            <div className="text-4xl font-bold mb-1">%{latestQuiz.accuracy}</div>
+            <div className="text-purple-100 text-sm">{latestQuiz.correctAnswers}/{latestQuiz.totalQuestions} doğru</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-orange-100">Toplam Test</span>
+              <BarChart3 size={24} />
+            </div>
+            <div className="text-4xl font-bold mb-1">{readingHistory.length}</div>
+            <div className="text-orange-100 text-sm">hız testi</div>
+          </div>
+        </div>
+
+        {hasHistory ? (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <TrendingUp className="text-indigo-600" />
+              Okuma Hızı Gelişimi
+            </h2>
+            
+            <div className="space-y-4">
+              {readingHistory.map((item, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">{item.test}</span>
+                    <span className="text-sm font-bold text-indigo-600">{item.speed} kelime/dk</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500 w-24">{new Date(item.date).toLocaleDateString('tr-TR')}</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000"
+                        style={{ width: `${(item.speed / 400) * 100}%` }}
+                      >
+                        <span className="text-white text-xs font-bold">{item.speed}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 pt-6 border-t">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">Hedef: 400 kelime/dakika</span>
+                <span className="text-sm font-bold text-gray-900">{Math.round((currentSpeed/400)*100)}% tamamlandı</span>
+              </div>
+              <div className="bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all"
+                  style={{ width: `${(currentSpeed/400)*100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
+            <Clock className="mx-auto text-blue-600 mb-4" size={48} />
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Henüz Test Yapmadınız</h3>
+            <p className="text-gray-600 mb-4">Okuma hızınızı ölçmek için ilk testinizi yapın!</p>
+            <button 
+              onClick={() => setCurrentPage('test')}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
+            >
+              Hız Testine Git →
+            </button>
+          </div>
+        )}
+
+        <div className="mt-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+          <h3 className="text-2xl font-bold mb-3">🎉 Harika Gidiyorsun!</h3>
+          <p className="text-indigo-100 mb-4">
+            {hasHistory ? `Okuma hızında ${improvementPercent}% artış sağladın. Bu tempoyu koru!` : 'Öğrenme yolculuğuna başla ve ilerlemeni takip et!'}
+          </p>
+          {hasHistory && (
+            <div className="bg-white/20 p-4 rounded-lg">
+              <p className="text-sm font-medium mb-2">Bir Sonraki Hedef:</p>
+              <p className="text-lg font-bold">300 kelime/dakika</p>
+              <div className="mt-2 bg-white/30 rounded-full h-2">
+                <div 
+                  className="bg-white h-2 rounded-full"
+                  style={{ width: `${Math.min((currentSpeed/300)*100, 100)}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
   // Eğer veri yoksa varsayılan göster
   const stats = userStats || {
