@@ -277,16 +277,17 @@ const ReadingPlatform = () => {
 
   // Veri kaydetme fonksiyonu
   const saveUserStats = async (newStats) => {
-    if (user) {
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, newStats);
-        setUserStats({ ...userStats, ...newStats });
-      } catch (error) {
-        console.error('Veri kaydetme hatası:', error);
-      }
+  if (user && userStats) {
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const updatedData = { ...userStats, ...newStats };
+      await setDoc(userRef, updatedData, { merge: true });
+      setUserStats(updatedData);
+    } catch (error) {
+      console.error('Veri kaydetme hatası:', error);
     }
-  };
+  }
+};
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
