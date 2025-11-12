@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const ReadingPlatform = () => {
@@ -223,6 +224,69 @@ const ReadingPlatform = () => {
   }, [isReading, startTime]);
 
   // Firebase auth listener
+  // Kullanıcı verilerini yükle
+  const [userStats, setUserStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUserStats = async () => {
+      if (user) {
+        setStatsLoading(true);
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          
+          if (userSnap.exists()) {
+            setUserStats(userSnap.data());
+          } else {
+            // İlk kez giren kullanıcı için varsayılan veri
+            const defaultStats = {
+              readingSpeedHistory: [],
+              quizResults: [],
+              weeklyActivity: [
+                { week: 'Hafta 1', completed: 0 },
+                { week: 'Hafta 2', completed: 0 },
+                { week: 'Hafta 3', completed: 0 },
+                { week: 'Hafta 4', completed: 0 }
+              ],
+              weeklyGoals: {
+                videoWatched: false,
+                quizCompleted: false,
+                speedTest: false,
+                eyeExercises: 0,
+                homeworkDone: false
+              },
+              achievements: []
+            };
+            await setDoc(userRef, defaultStats);
+            setUserStats(defaultStats);
+          }
+        } catch (error) {
+          console.error('Veri yükleme hatası:', error);
+        } finally {
+          setStatsLoading(false);
+        }
+      } else {
+        setUserStats(null);
+        setStatsLoading(false);
+      }
+    };
+
+    loadUserStats();
+  }, [user]);
+
+  // Veri kaydetme fonksiyonu
+  const saveUserStats = async (newStats) => {
+    if (user) {
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, newStats);
+        setUserStats({ ...userStats, ...newStats });
+      } catch (error) {
+        console.error('Veri kaydetme hatası:', error);
+      }
+    }
+  };
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -301,6 +365,7 @@ const ReadingPlatform = () => {
     setQuizResults([]);
     setQuizCompleted(false);
   };
+  
 // Kayıt fonksiyonu
   const handleRegister = async (e) => {
     e.preventDefault();
