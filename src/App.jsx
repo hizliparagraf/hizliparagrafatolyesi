@@ -313,20 +313,39 @@ const ReadingPlatform = () => {
     setShowResult(false);
   };
 
-  const stopReading = () => {
-    setIsReading(false);
-    const timeInSeconds = elapsedTime / 1000;
-    const wpm = Math.round((wordCount / timeInSeconds) * 60);
-    const result = {
-      date: new Date().toLocaleDateString('tr-TR'),
-      time: formatTime(elapsedTime),
-      wpm: wpm,
-      wordCount: wordCount
-    };
-    setCurrentResult(result);
-    setReadingResults([...readingResults, result]);
-    setShowResult(true);
+  const stopReading = async () => {
+  setIsReading(false);
+  const timeInSeconds = elapsedTime / 1000;
+  const wpm = Math.round((wordCount / timeInSeconds) * 60);
+  const result = {
+    date: new Date().toLocaleDateString('tr-TR'),
+    time: formatTime(elapsedTime),
+    wpm: wpm,
+    wordCount: wordCount
   };
+  setCurrentResult(result);
+  setReadingResults([...readingResults, result]);
+  setShowResult(true);
+  
+  // Firestore'a kaydet
+  if (user && userStats) {
+    const speedRecord = {
+      date: new Date().toISOString(),
+      speed: wpm,
+      test: `Test ${(userStats.readingSpeedHistory || []).length + 1}`
+    };
+    
+    const updatedStats = {
+      readingSpeedHistory: [...(userStats.readingSpeedHistory || []), speedRecord],
+      weeklyGoals: {
+        ...userStats.weeklyGoals,
+        speedTest: true
+      }
+    };
+    
+    await saveUserStats(updatedStats);
+  }
+};
 
   const resetTest = () => {
     setIsReading(false);
@@ -348,16 +367,36 @@ const ReadingPlatform = () => {
     setShowExplanation(true);
   };
 
-  const handleNextQuestion = () => {
-    if (currentQuestion < quizData.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-      setShowExplanation(false);
-    } else {
-      setQuizCompleted(true);
+ const handleNextQuestion = async () => {
+  if (currentQuestion < quizData.length - 1) {
+    setCurrentQuestion(currentQuestion + 1);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
+  } else {
+    setQuizCompleted(true);
+    
+    // Quiz tamamlandı - Firestore'a kaydet
+    if (user && userStats) {
+      const correctCount = quizResults.filter(r => r.correct).length;
+      const quizResult = {
+        date: new Date().toISOString(),
+        totalQuestions: quizData.length,
+        correctAnswers: correctCount,
+        accuracy: Math.round((correctCount / quizData.length) * 100)
+      };
+      
+      const updatedStats = {
+        quizResults: [...(userStats.quizResults || []), quizResult],
+        weeklyGoals: {
+          ...userStats.weeklyGoals,
+          quizCompleted: true
+        }
+      };
+      
+      await saveUserStats(updatedStats);
     }
-  };
-
+  }
+};
   const resetQuiz = () => {
     setCurrentQuestion(0);
     setSelectedAnswer(null);
@@ -936,6 +975,43 @@ Dashboard
   </div>
 </div>);
 const ProgressPage = () => {
+  // Eğer veri yükleniyorsa loading göster
+  if (statsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Veriler yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Eğer veri yoksa varsayılan göster
+  const stats = userStats || {
+    readingSpeedHistory: [],
+    quizResults: [],
+    weeklyActivity: [
+      { week: 'Hafta 1', completed: 0 },
+      { week: 'Hafta 2', completed: 0 },
+      { week: 'Hafta 3', completed: 0 },
+      { week: 'Hafta 4', completed: 0 }
+    ]
+  };
+
+  // Quiz istatistikleri hesapla
+  const latestQuiz = stats.quizResults && stats.quizResults.length > 0 
+    ? stats.quizResults[stats.quizResults.length - 1]
+    : { totalQuestions: 0, correctAnswers: 0, accuracy: 0 };
+
+  // Okuma hızı hesapla
+  const readingHistory = stats.readingSpeedHistory || [];
+  const initialSpeed = readingHistory.length > 0 ? readingHistory[0].speed : 0;
+  const currentSpeed = readingHistory.length > 0 ? readingHistory[readingHistory.length - 1].speed : 0;
+  const improvement = currentSpeed - initialSpeed;
+  const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
+
+  return (
 const initialSpeed = studentStats.readingSpeedHistory[0].speed;
 const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
 const improvement = currentSpeed - initialSpeed;
