@@ -230,56 +230,56 @@ const ReadingPlatform = () => {
 
  useEffect(() => {
   const loadUserStats = async () => {
-    if (user) {
-      // ÖNCEKİ VERİYİ TEMİZLE
-      setUserStats(null);
-      setStatsLoading(true);
-      
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (userSnap.exists()) {
-          setUserStats(userSnap.data());
-        } else {
-          const defaultStats = {
-            readingSpeedHistory: [],
-            quizResults: [],
-            weeklyActivity: [
-              { week: 'Hafta 1', completed: 0 },
-              { week: 'Hafta 2', completed: 0 },
-              { week: 'Hafta 3', completed: 0 },
-              { week: 'Hafta 4', completed: 0 }
-            ],
-            weeklyGoals: {
-              videoWatched: false,
-              quizCompleted: false,
-              speedTest: false,
-              eyeExercises: 0,
-              homeworkDone: false
-            },
-            achievements: []
-          };
-          await setDoc(userRef, defaultStats);
-          setUserStats(defaultStats);
-        }
-      } catch (error) {
-        console.error('Veri yükleme hatası:', error);
-        setUserStats(null);
-      } finally {
-        setStatsLoading(false);
+    // her kullanıcı değiştiğinde önce temizle
+    setUserStats(null);
+    setStatsLoading(true);
+
+    if (!user) {
+      setStatsLoading(false);
+      return;
+    }
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        setUserStats(userSnap.data());
+      } else {
+        const defaultStats = {
+          readingSpeedHistory: [],
+          quizResults: [],
+          weeklyActivity: [
+            { week: 'Hafta 1', completed: 0 },
+            { week: 'Hafta 2', completed: 0 },
+            { week: 'Hafta 3', completed: 0 },
+            { week: 'Hafta 4', completed: 0 },
+          ],
+          weeklyGoals: {
+            videoWatched: false,
+            quizCompleted: false,
+            speedTest: false,
+            eyeExercises: 0,
+            homeworkDone: false,
+          },
+          achievements: [],
+        };
+        await setDoc(userRef, defaultStats);
+        setUserStats(defaultStats);
       }
-    } else {
+    } catch (error) {
+      console.error('Veri yükleme hatası:', error);
       setUserStats(null);
+    } finally {
       setStatsLoading(false);
     }
   };
 
   loadUserStats();
 }, [user]);
-  
-  // Veri kaydetme fonksiyonu
-  const saveUserStats = async (newStats) => {
+
+// 🔹 Kaydetme fonksiyonu aynı kalabilir
+const saveUserStats = async (newStats) => {
   if (user && userStats) {
     try {
       const userRef = doc(db, 'users', user.uid);
@@ -291,6 +291,7 @@ const ReadingPlatform = () => {
     }
   }
 };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
