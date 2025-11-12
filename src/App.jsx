@@ -228,53 +228,56 @@ const ReadingPlatform = () => {
   const [userStats, setUserStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadUserStats = async () => {
-      if (user) {
-        setStatsLoading(true);
-        try {
-          const userRef = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userRef);
-          
-          if (userSnap.exists()) {
-            setUserStats(userSnap.data());
-          } else {
-            // İlk kez giren kullanıcı için varsayılan veri
-            const defaultStats = {
-              readingSpeedHistory: [],
-              quizResults: [],
-              weeklyActivity: [
-                { week: 'Hafta 1', completed: 0 },
-                { week: 'Hafta 2', completed: 0 },
-                { week: 'Hafta 3', completed: 0 },
-                { week: 'Hafta 4', completed: 0 }
-              ],
-              weeklyGoals: {
-                videoWatched: false,
-                quizCompleted: false,
-                speedTest: false,
-                eyeExercises: 0,
-                homeworkDone: false
-              },
-              achievements: []
-            };
-            await setDoc(userRef, defaultStats);
-            setUserStats(defaultStats);
-          }
-        } catch (error) {
-          console.error('Veri yükleme hatası:', error);
-        } finally {
-          setStatsLoading(false);
+ useEffect(() => {
+  const loadUserStats = async () => {
+    if (user) {
+      // ÖNCEKİ VERİYİ TEMİZLE
+      setUserStats(null);
+      setStatsLoading(true);
+      
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          setUserStats(userSnap.data());
+        } else {
+          const defaultStats = {
+            readingSpeedHistory: [],
+            quizResults: [],
+            weeklyActivity: [
+              { week: 'Hafta 1', completed: 0 },
+              { week: 'Hafta 2', completed: 0 },
+              { week: 'Hafta 3', completed: 0 },
+              { week: 'Hafta 4', completed: 0 }
+            ],
+            weeklyGoals: {
+              videoWatched: false,
+              quizCompleted: false,
+              speedTest: false,
+              eyeExercises: 0,
+              homeworkDone: false
+            },
+            achievements: []
+          };
+          await setDoc(userRef, defaultStats);
+          setUserStats(defaultStats);
         }
-      } else {
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error);
         setUserStats(null);
+      } finally {
         setStatsLoading(false);
       }
-    };
+    } else {
+      setUserStats(null);
+      setStatsLoading(false);
+    }
+  };
 
-    loadUserStats();
-  }, [user]);
-
+  loadUserStats();
+}, [user]);
+  
   // Veri kaydetme fonksiyonu
   const saveUserStats = async (newStats) => {
   if (user && userStats) {
