@@ -224,21 +224,6 @@ const ReadingPlatform = () => {
   }, [isReading, startTime]);
 
   // Firebase auth listener
-  
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-        if (currentPage !== 'landing' && currentPage !== 'auth') {
-          setCurrentPage('landing');
-        }
-      }
-    });
-    return () => unsubscribe();
-  }, []);
   // Kullanıcı verilerini yükle
   const [userStats, setUserStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -302,6 +287,20 @@ const ReadingPlatform = () => {
       }
     }
   };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+        if (currentPage !== 'landing' && currentPage !== 'auth') {
+          setCurrentPage('landing');
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
   const formatTime = (ms) => {
     const seconds = Math.floor(ms / 1000);
     const milliseconds = Math.floor((ms % 1000) / 100);
@@ -314,39 +313,20 @@ const ReadingPlatform = () => {
     setShowResult(false);
   };
 
-  const stopReading = async () => {
-  setIsReading(false);
-  const timeInSeconds = elapsedTime / 1000;
-  const wpm = Math.round((wordCount / timeInSeconds) * 60);
-  const result = {
-    date: new Date().toLocaleDateString('tr-TR'),
-    time: formatTime(elapsedTime),
-    wpm: wpm,
-    wordCount: wordCount
+  const stopReading = () => {
+    setIsReading(false);
+    const timeInSeconds = elapsedTime / 1000;
+    const wpm = Math.round((wordCount / timeInSeconds) * 60);
+    const result = {
+      date: new Date().toLocaleDateString('tr-TR'),
+      time: formatTime(elapsedTime),
+      wpm: wpm,
+      wordCount: wordCount
+    };
+    setCurrentResult(result);
+    setReadingResults([...readingResults, result]);
+    setShowResult(true);
   };
-  setCurrentResult(result);
-  setReadingResults([...readingResults, result]);
-  setShowResult(true);
-  
-  // Firestore'a kaydet
-  if (user && userStats) {
-    const speedRecord = {
-      date: new Date().toISOString(),
-      speed: wpm,
-      test: `Test ${(userStats.readingSpeedHistory || []).length + 1}`
-    };
-    
-    const updatedStats = {
-      readingSpeedHistory: [...(userStats.readingSpeedHistory || []), speedRecord],
-      weeklyGoals: {
-        ...userStats.weeklyGoals,
-        speedTest: true
-      }
-    };
-    
-    await saveUserStats(updatedStats);
-  }
-};
 
   const resetTest = () => {
     setIsReading(false);
@@ -368,36 +348,16 @@ const ReadingPlatform = () => {
     setShowExplanation(true);
   };
 
- const handleNextQuestion = async () => {
-  if (currentQuestion < quizData.length - 1) {
-    setCurrentQuestion(currentQuestion + 1);
-    setSelectedAnswer(null);
-    setShowExplanation(false);
-  } else {
-    setQuizCompleted(true);
-    
-    // Quiz tamamlandı - Firestore'a kaydet
-    if (user && userStats) {
-      const correctCount = quizResults.filter(r => r.correct).length;
-      const quizResult = {
-        date: new Date().toISOString(),
-        totalQuestions: quizData.length,
-        correctAnswers: correctCount,
-        accuracy: Math.round((correctCount / quizData.length) * 100)
-      };
-      
-      const updatedStats = {
-        quizResults: [...(userStats.quizResults || []), quizResult],
-        weeklyGoals: {
-          ...userStats.weeklyGoals,
-          quizCompleted: true
-        }
-      };
-      
-      await saveUserStats(updatedStats);
+  const handleNextQuestion = () => {
+    if (currentQuestion < quizData.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+      setShowExplanation(false);
+    } else {
+      setQuizCompleted(true);
     }
-  }
-};
+  };
+
   const resetQuiz = () => {
     setCurrentQuestion(0);
     setSelectedAnswer(null);
@@ -976,44 +936,8 @@ Dashboard
   </div>
 </div>);
 const ProgressPage = () => {
-  // Eğer veri yükleniyorsa loading göster
-  if (statsLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Veriler yükleniyor...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Eğer veri yoksa varsayılan göster
-  const stats = userStats || {
-    readingSpeedHistory: [],
-    quizResults: [],
-    weeklyActivity: [
-      { week: 'Hafta 1', completed: 0 },
-      { week: 'Hafta 2', completed: 0 },
-      { week: 'Hafta 3', completed: 0 },
-      { week: 'Hafta 4', completed: 0 }
-    ]
-  };
-
-  // Quiz istatistikleri hesapla
-  const latestQuiz = stats.quizResults && stats.quizResults.length > 0 
-    ? stats.quizResults[stats.quizResults.length - 1]
-    : { totalQuestions: 0, correctAnswers: 0, accuracy: 0 };
-
-  // Okuma hızı hesapla
-  const readingHistory = stats.readingSpeedHistory || [];
-  const initialSpeed = readingHistory.length > 0 ? readingHistory[0].speed : 0;
-  const currentSpeed = readingHistory.length > 0 ? readingHistory[readingHistory.length - 1].speed : 0;
-  const improvement = currentSpeed - initialSpeed;
-  const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
-
-const initialSpeed = stats.readingSpeedHistory[0].speed;
-const currentSpeed = stats.readingSpeedHistory[stats.readingSpeedHistory.length - 1].speed;
+const initialSpeed = studentStats.readingSpeedHistory[0].speed;
+const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
 const improvement = currentSpeed - initialSpeed;
 const improvementPercent = Math.round((improvement / initialSpeed) * 100);
   return (
@@ -1058,8 +982,8 @@ const improvementPercent = Math.round((improvement / initialSpeed) * 100);
             <span className="text-purple-100">Quiz Başarısı</span>
             <CheckCircle size={24} />
           </div>
-          <div className="text-4xl font-bold mb-1">%{stats.quizPerformance.accuracy}</div>
-          <div className="text-purple-100 text-sm">{stats.quizPerformance.correctAnswers}/{stats.quizPerformance.totalQuestions} doğru</div>
+          <div className="text-4xl font-bold mb-1">%{studentStats.quizPerformance.accuracy}</div>
+          <div className="text-purple-100 text-sm">{studentStats.quizPerformance.correctAnswers}/{studentStats.quizPerformance.totalQuestions} doğru</div>
         </div>
 
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
@@ -1067,7 +991,7 @@ const improvementPercent = Math.round((improvement / initialSpeed) * 100);
             <span className="text-orange-100">Toplam Test</span>
             <BarChart3 size={24} />
           </div>
-          <div className="text-4xl font-bold mb-1">{stats.readingSpeedHistory.length}</div>
+          <div className="text-4xl font-bold mb-1">{studentStats.readingSpeedHistory.length}</div>
           <div className="text-orange-100 text-sm">hız testi</div>
         </div>
       </div>
@@ -1079,7 +1003,7 @@ const improvementPercent = Math.round((improvement / initialSpeed) * 100);
         </h2>
         
         <div className="space-y-4">
-          {stats.readingSpeedHistory.map((item, idx) => (
+          {studentStats.readingSpeedHistory.map((item, idx) => (
             <div key={idx}>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">{item.test}</span>
