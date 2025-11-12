@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase"; // senin firebase.js dosyan
 import { Home, TrendingUp, Award, CheckCircle, BarChart3, Clock, Play, Pause, RotateCcw } from "lucide-react";
-import Logo from "./components/Logo"; // varsa logo component'in
+
 
 // =========================
 // ProgressPage (Kişiye özel istatistik sayfası)
@@ -115,7 +115,8 @@ const ProgressPage = ({ setCurrentPage }) => {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Logo />
+         <h1 className="text-xl font-bold text-indigo-600">Hızlı Paragraf Atölyesi</h1>
+
           <button
             onClick={() => setCurrentPage("dashboard")}
             className="text-indigo-600 hover:underline flex items-center gap-2"
