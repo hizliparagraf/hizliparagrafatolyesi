@@ -936,7 +936,7 @@ Dashboard
   </div>
 </div>);
 const ProgressPage = () => {
-  // Eğer veri yükleniyorsa loading göster
+  // Loading durumu
   if (statsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -947,6 +947,60 @@ const ProgressPage = () => {
       </div>
     );
   }
+
+  // Kullanıcı verisi veya varsayılan
+  const stats = userStats || {
+    readingSpeedHistory: [],
+    quizResults: [],
+    weeklyActivity: [
+      { week: 'Hafta 1', completed: 0 },
+      { week: 'Hafta 2', completed: 0 },
+      { week: 'Hafta 3', completed: 0 },
+      { week: 'Hafta 4', completed: 0 }
+    ],
+    weeklyGoals: {
+      videoWatched: false,
+      quizCompleted: false,
+      speedTest: false,
+      eyeExercises: 0,
+      homeworkDone: false
+    }
+  };
+
+  // Quiz istatistikleri
+  const latestQuiz = stats.quizResults && stats.quizResults.length > 0 
+    ? stats.quizResults[stats.quizResults.length - 1]
+    : { totalQuestions: 0, correctAnswers: 0, accuracy: 0 };
+
+  // Okuma hızı hesapla
+  const readingHistory = stats.readingSpeedHistory || [];
+  const hasHistory = readingHistory.length > 0;
+  const initialSpeed = hasHistory ? readingHistory[0].speed : 0;
+  const currentSpeed = hasHistory ? readingHistory[readingHistory.length - 1].speed : 0;
+  const improvement = currentSpeed - initialSpeed;
+  const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white shadow-sm p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Logo />
+          <button onClick={() => setCurrentPage('dashboard')} className="text-indigo-600 hover:underline flex items-center gap-2">
+            <Home size={20} />
+            Dashboard
+          </button>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">İlerleme & İstatistikler</h1>
+          <p className="text-gray-600">Gelişiminizi takip edin</p>
+        </div>
+
+        {/* Eğer veri yoksa bilgi göster */}
+        {!hasHistory && latestQuiz.totalQuestions === 0 && (
+          <div className="bg-blue
 
   // Eğer veri yoksa varsayılan göster
   const stats = userStats || {
