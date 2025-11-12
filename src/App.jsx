@@ -936,10 +936,42 @@ Dashboard
   </div>
 </div>);
 const ProgressPage = () => {
-const initialSpeed = studentStats.readingSpeedHistory[0].speed;
-const currentSpeed = studentStats.readingSpeedHistory[studentStats.readingSpeedHistory.length - 1].speed;
-const improvement = currentSpeed - initialSpeed;
-const improvementPercent = Math.round((improvement / initialSpeed) * 100);
+  // Eğer veri yükleniyorsa loading göster
+  if (statsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Veriler yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Eğer veri yoksa varsayılan göster
+  const stats = userStats || {
+    readingSpeedHistory: [],
+    quizResults: [],
+    weeklyActivity: [
+      { week: 'Hafta 1', completed: 0 },
+      { week: 'Hafta 2', completed: 0 },
+      { week: 'Hafta 3', completed: 0 },
+      { week: 'Hafta 4', completed: 0 }
+    ]
+  };
+
+  // Quiz istatistikleri hesapla
+  const latestQuiz = stats.quizResults && stats.quizResults.length > 0 
+    ? stats.quizResults[stats.quizResults.length - 1]
+    : { totalQuestions: 0, correctAnswers: 0, accuracy: 0 };
+
+  // Okuma hızı hesapla
+  const readingHistory = stats.readingSpeedHistory || [];
+  const initialSpeed = readingHistory.length > 0 ? readingHistory[0].speed : 0;
+  const currentSpeed = readingHistory.length > 0 ? readingHistory[readingHistory.length - 1].speed : 0;
+  const improvement = currentSpeed - initialSpeed;
+  const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
+
   return (
   <div className="min-h-screen bg-gray-50">
     <nav className="bg-white shadow-sm p-4">
