@@ -224,6 +224,21 @@ const ReadingPlatform = () => {
   }, [isReading, startTime]);
 
   // Firebase auth listener
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+        if (currentPage !== 'landing' && currentPage !== 'auth') {
+          setCurrentPage('landing');
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
   // Kullanıcı verilerini yükle
   const [userStats, setUserStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -287,20 +302,6 @@ const ReadingPlatform = () => {
       }
     }
   };
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-        if (currentPage !== 'landing' && currentPage !== 'auth') {
-          setCurrentPage('landing');
-        }
-      }
-    });
-    return () => unsubscribe();
-  }, []);
   const formatTime = (ms) => {
     const seconds = Math.floor(ms / 1000);
     const milliseconds = Math.floor((ms % 1000) / 100);
