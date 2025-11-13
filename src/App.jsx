@@ -4,14 +4,18 @@ import { auth, db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
-// Helper function for time formatting
+// =================================================================
+// HELPER FONKSİYONLAR
+// =================================================================
+
+// Zaman formatlama
 const formatTime = (ms) => {
   const seconds = Math.floor(ms / 1000);
   const milliseconds = Math.floor((ms % 1000) / 100);
   return `${seconds}.${milliseconds}`;
 };
 
-// Helper function for quiz stats
+// Quiz istatistiklerini hesaplama
 const calculateQuizStats = (results, quizData) => {
   const totalQuestions = quizData.length;
   const correctAnswers = results.filter(r => r.correct).length;
@@ -179,7 +183,7 @@ const ReadingPlatform = () => {
     };
 
     loadUserStats();
-  }, [user]);
+  }, [user, db]); // db bağımlılığı eklendi
 
   // Auth listener
   useEffect(() => {
