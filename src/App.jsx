@@ -130,18 +130,52 @@ const ReadingPlatform = () => {
         const userSnap = await getDoc(userRef);
         const currentStats = userSnap.exists() ? userSnap.data() : {};
 
-        const updatedData = { ...currentStats, ...newStats };
+        // Yeni veriyi mevcut veriye ekle
+        const updatedData = { ...currentStats };
+
+        // readingSpeedHistory'yi güncelle
+        if (newStats.readingSpeedHistory) {
+            updatedData.readingSpeedHistory = [...(currentStats.readingSpeedHistory || []), ...newStats.readingSpeedHistory];
+            delete newStats.readingSpeedHistory;
+        }
+
+        // quizResults'ı güncelle
+        if (newStats.quizResults) {
+            updatedData.quizResults = [...(currentStats.quizResults || []), ...newStats.quizResults];
+            delete newStats.quizResults;
+        }
+
+        // Diğer verileri merge et
+        Object.assign(updatedData, newStats);
         
         await setDoc(userRef, updatedData, { merge: true });
         
         // State'i güncellemek için fonksiyonel form kullan
-        setUserStats(prevStats => ({ ...prevStats, ...newStats }));
+        setUserStats(prevStats => {
+            // Önceki state'i al
+            let newStatsState = { ...prevStats };
+
+            // readingSpeedHistory'yi güncelle
+            if (newStats.readingSpeedHistory) {
+                newStatsState.readingSpeedHistory = [...(prevStats?.readingSpeedHistory || []), ...newStats.readingSpeedHistory];
+            }
+
+            // quizResults'ı güncelle
+            if (newStats.quizResults) {
+                newStatsState.quizResults = [...(prevStats?.quizResults || []), ...newStats.quizResults];
+            }
+
+            // Diğer verileri merge et
+            Object.assign(newStatsState, newStats);
+
+            return newStatsState;
+        });
 
       } catch (error) {
         console.error('❌ Veri kaydetme hatası:', error);
       }
     }
-  }, [user]); // user bağımlılığı eklendi, db'ye gerek yok
+  }, [user]); // user bağımlılığı eklendi
 
   // Kullanıcı verilerini yükle
   useEffect(() => {
@@ -243,7 +277,7 @@ const ReadingPlatform = () => {
     
     // Hız testi sonucunu kaydet
     saveUserStats({
-      readingSpeedHistory: [...(userStats?.readingSpeedHistory || []), result]
+      readingSpeedHistory: [result] // Sadece yeni sonucu gönder
     });
     setShowResult(true);
   };
@@ -279,7 +313,7 @@ const ReadingPlatform = () => {
       const finalResults = calculateQuizStats(quizResults, quizData);
       saveUserStats({
         quizPerformance: finalResults,
-        quizResults: [...(userStats?.quizResults || []), {
+        quizResults: [{ // Sadece yeni sonucu gönder
           date: new Date().toISOString(),
           correct: finalResults.correctAnswers,
           total: finalResults.totalQuestions,
