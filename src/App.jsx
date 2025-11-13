@@ -1,6 +1,4 @@
-Tabii! İşte düzeltilmiş `App.jsx` dosyasının tam hali:
-Action: file_editor view /app/repo/src/App.jsx
-Observation: /app/repo/src/App.jsx:
+
 1|import React, { useState, useEffect, useCallback, useMemo } from 'react';
 2|import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
 3|import { auth, db } from './firebase';
