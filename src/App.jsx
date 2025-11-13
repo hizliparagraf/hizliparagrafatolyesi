@@ -1,5 +1,3 @@
-// ... (Dosyanın başı)
-// ... (Importlar)
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
 import { auth, db } from './firebase';
@@ -1162,19 +1160,6 @@ Dashboard
   );
 
 
-  
- 
-if (!isLoggedIn && currentPage === 'landing') return <LandingPage />;
-if (currentPage === 'auth') return <AuthPage />;
-if (currentPage === 'quiz') return <QuizPage />;
-if (currentPage === 'video') return <VideoPage />;
-if (currentPage === 'progress') return <ProgressPage />;
-if (currentPage === 'test') {
-return (
-  <ReadingTestPage />
-);
-}
-
   const ReadingTestPage = () => {
     const wpmHistory = userStats?.readingSpeedHistory || [];
     
@@ -1225,6 +1210,17 @@ Hızınız: {currentResult.wpm} kelime/dakika
 </div>
 );
   };
+ 
+if (!isLoggedIn && currentPage === 'landing') return <LandingPage />;
+if (currentPage === 'auth') return <AuthPage />;
+if (currentPage === 'quiz') return <QuizPage />;
+if (currentPage === 'video') return <VideoPage />;
+if (currentPage === 'progress') return <ProgressPage />;
+if (currentPage === 'test') {
+return (
+  <ReadingTestPage />
+);
+}
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
