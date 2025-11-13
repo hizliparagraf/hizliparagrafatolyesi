@@ -280,15 +280,26 @@ const ReadingPlatform = () => {
   
   // Veri kaydetme fonksiyonu
   const saveUserStats = async (newStats) => {
+  console.log('💾 Kaydediliyor - User ID:', user?.uid);
+  console.log('📊 Kaydedilen veri:', newStats);
+  
   if (user && userStats) {
     try {
       const userRef = doc(db, 'users', user.uid);
       const updatedData = { ...userStats, ...newStats };
+      
+      console.log('✅ Firestore yolu:', `users/${user.uid}`);
+      console.log('📦 Tam veri:', updatedData);
+      
       await setDoc(userRef, updatedData, { merge: true });
       setUserStats(updatedData);
+      
+      console.log('✔️ Kayıt başarılı!');
     } catch (error) {
-      console.error('Veri kaydetme hatası:', error);
+      console.error('❌ Veri kaydetme hatası:', error);
     }
+  } else {
+    console.log('⚠️ User veya userStats null!', { user: !!user, userStats: !!userStats });
   }
 };
   useEffect(() => {
