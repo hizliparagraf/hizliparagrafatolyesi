@@ -1,5 +1,4 @@
-Git push için authentication lazım. Bu durumda size temiz dosyayı vereyim, siz manuel olarak GitHub'a yükleyin:
-Action: file_editor create /app/repo/App_TEMIZ.jsx --file-text "import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
 import { auth, db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
