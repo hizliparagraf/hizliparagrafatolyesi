@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
 import { auth, db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -120,26 +120,33 @@ const ReadingPlatform = () => {
   // FIREBASE VE VERİ YÖNETİMİ
   // =================================================================
 
-  // Veri kaydetme fonksiyonu
-  const saveUserStats = async (newStats) => {
-    if (user && userStats) {
+  // Veri kaydetme fonksiyonu - userStats'ı bağımlılık olarak almadan güncelleyen versiyon
+  const saveUserStats = useCallback(async (newStats) => {
+    if (user) {
       try {
         const userRef = doc(db, 'users', user.uid);
-        const updatedData = { ...userStats, ...newStats };
+        
+        // Firestore'dan güncel veriyi çek
+        const userSnap = await getDoc(userRef);
+        const currentStats = userSnap.exists() ? userSnap.data() : {};
+
+        const updatedData = { ...currentStats, ...newStats };
         
         await setDoc(userRef, updatedData, { merge: true });
-        setUserStats(updatedData);
+        
+        // State'i güncellemek için fonksiyonel form kullan
+        setUserStats(prevStats => ({ ...prevStats, ...newStats }));
+
       } catch (error) {
         console.error('❌ Veri kaydetme hatası:', error);
       }
     }
-  };
+  }, [user]); // user bağımlılığı eklendi, db'ye gerek yok
 
   // Kullanıcı verilerini yükle
   useEffect(() => {
     const loadUserStats = async () => {
       if (user) {
-        setUserStats(null);
         setStatsLoading(true);
         
         try {
@@ -183,7 +190,7 @@ const ReadingPlatform = () => {
     };
 
     loadUserStats();
-  }, [user, db]); // db bağımlılığı eklendi
+  }, [user, db]); // db bağımlılığı korundu
 
   // Auth listener
   useEffect(() => {
@@ -1100,7 +1107,7 @@ const ReadingPlatform = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Yükleniyor...</p>
+        <p className="text-gray-600">Veriler yükleniyor...</p>
       </div>
     </div>
   );
