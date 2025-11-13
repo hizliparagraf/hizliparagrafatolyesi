@@ -1,3 +1,5 @@
+// ... (Dosyanın başı)
+// ... (Importlar)
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BookOpen, TrendingUp, Award, Video, FileText, CheckCircle, Circle, Clock, BarChart3, User, LogOut, Check, X, ChevronRight, ChevronLeft, Home } from 'lucide-react';
 import { auth, db } from './firebase';
@@ -11,7 +13,7 @@ const ReadingPlatform = () => {
   const [isReading, setIsReading] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [readingResults, setReadingResults] = useState([]);
+  const [readingResults, setReadingResults] = useState([]); // Bu artık sadece yerel test için
   const [showResult, setShowResult] = useState(false);
   const [currentResult, setCurrentResult] = useState(null);
 
@@ -31,6 +33,7 @@ const ReadingPlatform = () => {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   
+  // Varsayılan istatistikler (userStats yüklenene kadar kullanılır)
   const studentStats = {
     weeklyActivity: [
       { week: 'Hafta 1', completed: 75 },
@@ -39,10 +42,10 @@ const ReadingPlatform = () => {
       { week: 'Hafta 4', completed: 0 }
     ],
     readingSpeedHistory: [
-      { date: '1 Kas', speed: 200, test: 'İlk Test' },
-      { date: '3 Kas', speed: 225, test: 'Test 2' },
-      { date: '5 Kas', speed: 245, test: 'Test 3' },
-      { date: '7 Kas', speed: 260, test: 'Test 4' }
+      { date: '1 Kas', wpm: 200, test: 'İlk Test' },
+      { date: '3 Kas', wpm: 225, test: 'Test 2' },
+      { date: '5 Kas', wpm: 245, test: 'Test 3' },
+      { date: '7 Kas', wpm: 260, test: 'Test 4' }
     ],
     quizPerformance: {
       totalQuestions: 10,
@@ -68,6 +71,7 @@ const ReadingPlatform = () => {
   };
 
   const quizData = [
+    // ... (Quiz verileri)
     {
       id: 1,
       difficulty: "Kolay",
@@ -183,7 +187,7 @@ const ReadingPlatform = () => {
     {
       id: 9,
       difficulty: "Çok Zor",
-      text: "Eleştirel düşünme, bir bilgiyi sorgusuz kabul etmek yerine, onu analiz etme ve değerlendirme yeteneğidir. Günümüzde yanlış bilginin hızla yayıldığı dijital ortamda, gördüğümüz her habere inanmak büyük yanılgılara yol açabilir. Bir bilginin doğruluğunu sorgulamak, kaynaklarını araştırmak ve farklı bakış açılarını değerlendirmek, bilinçli bir birey olmanın gereğidir.",
+      text: "Günümüz bilgi çağında, bilgiye erişim kolaylaşmıştır ancak doğru bilgiye ulaşmak zorlaşmıştır. İnternet, her türlü içeriği barındırırken, bu içeriklerin güvenilirliği sorgulanmalıdır. Eleştirel düşünme becerisi, bireylerin karşılaştıkları bilgileri analiz etme, değerlendirme ve sentezleme yeteneğini ifade eder. Bu beceri, özellikle sosyal medyada yayılan yanlış bilgileri ayırt etmek için hayati önem taşır. Okulların ve ailelerin, gençlere sadece bilgi yüklemek yerine, onlara bilgiyi sorgulama ve eleştirel düşünme yeteneği kazandırması gerekmektedir.",
       question: "Bu paragrafın temel mesajı nedir?",
       options: [
         "Dijital ortamda yanlış bilgi çok yaygındır.",
@@ -339,7 +343,10 @@ const ReadingPlatform = () => {
       wordCount: wordCount
     };
     setCurrentResult(result);
-    setReadingResults([...readingResults, result]);
+    // Hız testi sonucunu kaydet
+    saveUserStats({
+      readingSpeedHistory: [...(userStats?.readingSpeedHistory || []), result]
+    });
     setShowResult(true);
   };
 
@@ -370,7 +377,34 @@ const ReadingPlatform = () => {
       setShowExplanation(false);
     } else {
       setQuizCompleted(true);
+      // Yeni eklenen kısım: Quiz sonuçlarını kaydet
+      const finalResults = calculateQuizStats(quizResults);
+      saveUserStats({
+        quizPerformance: finalResults,
+        quizResults: [...(userStats?.quizResults || []), {
+          date: new Date().toISOString(),
+          correct: finalResults.correctAnswers,
+          total: finalResults.totalQuestions,
+          accuracy: finalResults.accuracy,
+          results: quizResults
+        }]
+      });
     }
+  };
+
+  const calculateQuizStats = (results) => {
+    const totalQuestions = quizData.length;
+    const correctAnswers = results.filter(r => r.correct).length;
+    const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
+    
+    return {
+      totalQuestions,
+      correctAnswers,
+      accuracy,
+      timeSpent: 'N/A', // Zaman takibi eklenmediği için N/A
+      strongTopics: [],
+      weakTopics: []
+    };
   };
 
   const resetQuiz = () => {
@@ -660,7 +694,11 @@ const ReadingPlatform = () => {
 
   const QuizPage = () => {
     const currentQ = quizData[currentQuestion];
-    const correctCount = quizResults.filter(r => r.correct).length;
+    // Kullanıcının en son kaydettiği quiz sonuçlarını kullan
+    const latestQuiz = userStats?.quizResults?.[userStats.quizResults.length - 1];
+    const correctCount = latestQuiz ? latestQuiz.correct : quizResults.filter(r => r.correct).length;
+    const totalQuestions = latestQuiz ? latestQuiz.total : quizData.length;
+    const accuracy = latestQuiz ? latestQuiz.accuracy : Math.round((correctCount/totalQuestions)*100);
 
     if (quizCompleted) {
       return (
@@ -678,7 +716,7 @@ const ReadingPlatform = () => {
               <div className="grid md:grid-cols-3 gap-4 my-8">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <div className="text-gray-600 mb-2">Toplam Soru</div>
-                  <div className="text-4xl font-bold">{quizData.length}</div>
+                  <div className="text-4xl font-bold">{totalQuestions}</div>
                 </div>
                 <div className="bg-green-50 p-6 rounded-lg">
                   <div className="text-gray-600 mb-2">Doğru</div>
@@ -686,7 +724,7 @@ const ReadingPlatform = () => {
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <div className="text-gray-600 mb-2">Başarı</div>
-                  <div className="text-4xl font-bold text-indigo-600">%{Math.round((correctCount/quizData.length)*100)}</div>
+                  <div className="text-4xl font-bold text-indigo-600">%{accuracy}</div>
                 </div>
               </div>
               <div className="flex gap-4 justify-center">
@@ -710,13 +748,14 @@ const ReadingPlatform = () => {
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="flex justify-between items-center mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Ana Fikir Bulma</h2>
-                <p className="text-gray-600">Soru {currentQuestion + 1} / {quizData.length}</p>
-              </div>
-              <span className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-                currentQ.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' : 
-                currentQ.difficulty === 'Orta' ? 'bg-orange-100 text-orange-700' :
+              <h1 className="text-2xl font-bold text-gray-900">Quiz: Paragraf Soruları</h1>
+              <span className="text-lg font-semibold text-indigo-600">{currentQuestion + 1} / {quizData.length}</span>
+            </div>
+            
+            <div className="flex justify-between items-center mb-6">
+              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                currentQ.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' :
+                currentQ.difficulty === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
                 currentQ.difficulty === 'Zor' ? 'bg-red-100 text-red-700' :
                 'bg-purple-100 text-purple-700'
               }`}>
@@ -950,7 +989,7 @@ Dashboard
     </div>
   </div>
 </div>);
-const ProgressPage = () => {
+  const ProgressPage = () => {
   // Loading durumu
   if (statsLoading) {
     return (
@@ -983,8 +1022,8 @@ const ProgressPage = () => {
   // Okuma hızı
   const readingHistory = stats.readingSpeedHistory || [];
   const hasHistory = readingHistory.length > 0;
-  const initialSpeed = hasHistory ? readingHistory[0].speed : 200;
-  const currentSpeed = hasHistory ? readingHistory[readingHistory.length - 1].speed : 200;
+  const initialSpeed = hasHistory ? readingHistory[0].wpm : 200; // wpm kullan
+  const currentSpeed = hasHistory ? readingHistory[readingHistory.length - 1].wpm : 200; // wpm kullan
   const improvement = currentSpeed - initialSpeed;
   const improvementPercent = initialSpeed > 0 ? Math.round((improvement / initialSpeed) * 100) : 0;
 
@@ -1003,7 +1042,7 @@ const ProgressPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">İlerleme & İstatistikler</h1>
-          <p className="text-gray-600">Gelişiminizi takip edin</p>
+          <p className="text-gray-600">Gelişimizi takip edin</p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -1056,16 +1095,16 @@ const ProgressPage = () => {
                 <div key={idx}>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium text-gray-700">{item.test}</span>
-                    <span className="text-sm font-bold text-indigo-600">{item.speed} kelime/dk</span>
+                    <span className="text-sm font-bold text-indigo-600">{item.wpm} kelime/dk</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-gray-500 w-24">{new Date(item.date).toLocaleDateString('tr-TR')}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
                       <div 
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000"
-                        style={{ width: `${(item.speed / 400) * 100}%` }}
+                        style={{ width: `${(item.wpm / 400) * 100}%` }}
                       >
-                        <span className="text-white text-xs font-bold">{item.speed}</span>
+                        <span className="text-white text-xs font-bold">{item.wpm}</span>
                       </div>
                     </div>
                   </div>
@@ -1121,7 +1160,6 @@ const ProgressPage = () => {
       </div>
     </div>
   );
-};
 
 
   
@@ -1133,6 +1171,14 @@ if (currentPage === 'video') return <VideoPage />;
 if (currentPage === 'progress') return <ProgressPage />;
 if (currentPage === 'test') {
 return (
+  <ReadingTestPage />
+);
+}
+
+  const ReadingTestPage = () => {
+    const wpmHistory = userStats?.readingSpeedHistory || [];
+    
+    return (
 <div className="min-h-screen bg-gray-50">
 <nav className="bg-white shadow-sm p-4">
 <div className="max-w-4xl mx-auto flex justify-between items-center">
@@ -1160,29 +1206,34 @@ return (
 )}
 {isReading && (
 <button onClick={stopReading} className="flex items-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700">
-<Pause size={24} />Testi Bitir
+<Pause size={24} />Bitir
 </button>
 )}
-{(isReading || showResult) && (
-<button onClick={resetTest} className="flex items-center gap-2 bg-gray-600 text-white px-6 py-4 rounded-lg hover:bg-gray-700">
-<RotateCcw size={20} />Sıfırla
+{!isReading && showResult && currentResult && (
+<>
+<button onClick={resetTest} className="flex items-center gap-2 bg-gray-600 text-white px-8 py-4 rounded-lg hover:bg-gray-700">
+<RotateCcw size={24} />Tekrar Dene
 </button>
+<div className="bg-green-100 text-green-800 p-4 rounded-lg font-bold text-lg">
+Hızınız: {currentResult.wpm} kelime/dakika
+</div>
+</>
 )}
 </div>
-{showResult && currentResult && (
-<div className="mt-8 bg-green-50 border-2 border-green-200 rounded-xl p-8 text-center">
-<Award className="inline-block text-green-600 mb-4" size={64} />
-<h2 className="text-2xl font-bold mb-4">Test Tamamlandı!</h2>
-<div className="text-5xl font-bold text-indigo-600 mb-2">{currentResult.wpm}</div>
-<div className="text-gray-600">kelime/dakika</div>
-</div>
-)}
 </div>
 </div>
 </div>
 );
-}
-return <Dashboard />;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Yükleniyor...</p>
+      </div>
+    </div>
+  );
 };
 
-export default ReadingPlatform;                                                                                          
+export default ReadingPlatform;
