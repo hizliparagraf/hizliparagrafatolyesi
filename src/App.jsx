@@ -175,7 +175,7 @@ const ReadingPlatform = () => {
         console.error('❌ Veri kaydetme hatası:', error);
       }
     }
-  }, [user, db]); // db bağımlılığı eklendi
+  }, [user]); // db bağımlılığı kaldırıldı
 
   // Kullanıcı verilerini yükle
   useEffect(() => {
@@ -224,14 +224,14 @@ const ReadingPlatform = () => {
       }
     };
 
-    // user değiştiğinde veya db değiştiğinde çalışır
-    if (user && db) {
+    // Sadece user değiştiğinde çalışır
+    if (user) {
         loadUserStats();
-    } else if (!user) {
+    } else {
         // Kullanıcı çıkış yaptığında veya henüz giriş yapmadığında yüklemeyi bitir
         setStatsLoading(false);
     }
-  }, [user, db]);
+  }, [user]); // db bağımlılığı kaldırıldı
 
   // Auth listener
   useEffect(() => {
