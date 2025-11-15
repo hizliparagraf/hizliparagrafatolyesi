@@ -4,6 +4,8 @@ import { auth, db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
+// ... (Diğer helper fonksiyonlar ve sabitler aynı kalacak)
+
 // =================================================================
 // HELPER FONKSİYONLAR
 // =================================================================
@@ -219,17 +221,15 @@ const ReadingPlatform = () => {
           setStatsLoading(false);
         }
       } else {
+        // Kullanıcı yoksa veya çıkış yapmışsa yüklemeyi bitir
         setUserStats(null);
         setStatsLoading(false);
       }
     };
 
     // Sadece user değiştiğinde çalışır
-    if (user) {
+    if (user !== undefined) { // user'ın undefined olup olmadığını kontrol et
         loadUserStats();
-    } else {
-        // Kullanıcı çıkış yaptığında veya henüz giriş yapmadığında yüklemeyi bitir
-        setStatsLoading(false);
     }
   }, [user]); // db bağımlılığı kaldırıldı
 
